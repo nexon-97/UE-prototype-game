@@ -31,6 +31,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UBoxComponent* weaponCollision;
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="WeaponParams", meta=(DisplayName="WeaponSlotType"))
-	EWeaponSlotType m_weaponSlotType = EWeaponSlotType::Knife;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="WeaponParams", meta=(DisplayName="Weapon slot type"))
+	EWeaponSlotType weaponSlotType = EWeaponSlotType::Knife;
 };
