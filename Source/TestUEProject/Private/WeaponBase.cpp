@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Engine.h"
 
+const ECollisionChannel k_projectileCollisionChannel = ECollisionChannel::ECC_WorldDynamic;
 
 AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer)
 {
@@ -26,13 +27,82 @@ void AWeaponBase::BeginPlay()
 	Super::BeginPlay();
 	
 	weaponMesh->SetSimulatePhysics(true);
+
+	FireSocket = weaponMesh->GetSocketByName(TEXT("MuzzleFlash"));
 }
 
 // Called every frame
 void AWeaponBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
 }
 
+bool AWeaponBase::CanShoot() const
+{
+	bool timerElapsed = !GetWorld()->GetTimerManager().IsTimerActive(ShootTimer);
+	return ammoCount > 0 && timerElapsed;
+}
+
+int AWeaponBase::GetAmmoCountInClip() const
+{
+	return ammoCount;
+}
+
+bool AWeaponBase::Shoot()
+{
+	if (CanShoot())
+	{
+		ShootInternal();
+		return true;
+	}
+
+	return false;
+}
+
+void AWeaponBase::ShootInternal()
+{
+	--ammoCount;
+
+	// Run warmup timer
+	GetWorld()->GetTimerManager().SetTimer(ShootTimer, shootFrequency, false);
+
+	if (nullptr != FireSocket)
+	{
+		auto socketTransform = FireSocket->GetSocketTransform(weaponMesh);
+		
+		// Run line trace to determine target to hit
+		FHitResult hitResult;
+		FVector traceStart = socketTransform.GetLocation();
+		const float traceDistance = 30000.f;
+		FVector traceEnd = traceStart + socketTransform.GetRotation().GetForwardVector() * traceDistance;
+		DrawDebugLine(GetWorld(), traceStart, traceEnd, FColor(255, 0, 0), false, 2.f, 0, 2);
+
+		FCollisionQueryParams queryParams;
+		queryParams.AddIgnoredActor(GetOwner());
+		queryParams.AddIgnoredActor(this);
+
+		bool traceSucceeded = GetWorld()->LineTraceSingleByChannel(hitResult, traceStart, traceEnd, k_projectileCollisionChannel, queryParams);
+		if (traceSucceeded)
+		{
+			DrawDebugSolidBox(GetWorld(), hitResult.Location, FVector(5.f, 5.f, 5.f), FColor(255, 0, 0), false, 2.f);
+
+			auto pawnActor = Cast<APawn>(hitResult.GetActor());
+			if (nullptr != pawnActor)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Hit pawn!"));
+			}
+		}
+	}
+}
+
+int AWeaponBase::LoadClip(int loadCount)
+{
+	// Do some shoot action
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("LoadClip"));
+
+	const int remainingToFullLoad = clipSize - ammoCount;
+	int ammoLoaded = FMath::Min(remainingToFullLoad, loadCount);
+	ammoCount += ammoLoaded;
+
+	return ammoLoaded;
+}
