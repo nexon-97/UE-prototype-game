@@ -74,7 +74,17 @@ void AWeaponBase::ShootInternal()
 		FHitResult hitResult;
 		FVector traceStart = socketTransform.GetLocation();
 		const float traceDistance = 30000.f;
-		FVector traceEnd = traceStart + socketTransform.GetRotation().GetForwardVector() * traceDistance;
+		//FVector traceEnd = traceStart + socketTransform.GetRotation().GetForwardVector() * traceDistance;
+		FVector deprojectedLocation;
+		FVector deprojectedDirection;
+		APlayerController* controller = GetWorld()->GetFirstPlayerController();
+		FVector2D viewportSize;
+		GetWorld()->GetGameViewport()->GetViewportSize(viewportSize);
+		controller->DeprojectScreenPositionToWorld(viewportSize[0] * 0.5f, viewportSize[1] * 0.5f, deprojectedLocation, deprojectedDirection);
+
+		FVector traceEnd = deprojectedLocation + deprojectedDirection * traceDistance;
+		
+		//WorldRay = Camera.ViewportPointToRay(viewPoint2D);
 		DrawDebugLine(GetWorld(), traceStart, traceEnd, FColor(255, 0, 0), false, 2.f, 0, 2);
 
 		FCollisionQueryParams queryParams;
