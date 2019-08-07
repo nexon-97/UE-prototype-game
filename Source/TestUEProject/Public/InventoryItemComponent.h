@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "InventoryItemDef.h"
-#include "Templates/SharedPointer.h"
 #include "InventoryItemComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -23,5 +22,5 @@ public:
 	int m_count;
 
 	UFUNCTION(BlueprintCallable)
-	FString GetInventoryName() const;
+	const FString& GetInventoryName() const;
 };

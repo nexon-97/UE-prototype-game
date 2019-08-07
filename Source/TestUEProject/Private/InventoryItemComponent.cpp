@@ -4,6 +4,7 @@
 namespace
 {
 UDataTable* g_inventoryDB = nullptr;
+const FString k_defaultItemName = "$ITEM_NAME$";
 }
 
 UInventoryItemComponent::UInventoryItemComponent()
@@ -14,7 +15,7 @@ UInventoryItemComponent::UInventoryItemComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-FString UInventoryItemComponent::GetInventoryName() const
+const FString& UInventoryItemComponent::GetInventoryName() const
 {
 	if (nullptr != g_inventoryDB)
 	{
@@ -27,5 +28,5 @@ FString UInventoryItemComponent::GetInventoryName() const
 		}
 	}
 
-	return "$ITEM_NAME$";
+	return k_defaultItemName;
 }
