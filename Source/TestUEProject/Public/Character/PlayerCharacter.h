@@ -24,6 +24,11 @@ public:
 	void LookUp(float AxisValue);
 	void StartJump();
 	void StopJump();
+	void StartFire();
+	void StopFire();
+	void EquipKnife();
+	void EquipPistol();
+	void EquipRifle();
 
 private:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Weapon User Component", AllowPrivateAccess = "true"))

@@ -17,6 +17,8 @@ APlayerCharacter::APlayerCharacter()
 	m_camera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	m_camera->bEditableWhenInherited = true;
 	m_camera->AttachTo(m_cameraSpringArm, FName(TEXT("SpringEndpoint")));
+
+	m_weaponUser->ActorMesh = Cast<UMeshComponent>(GetMesh());
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -30,6 +32,12 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputCom
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::StartJump);
 	InputComponent->BindAction("Jump", IE_Released, this, &APlayerCharacter::StopJump);
+	InputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::StartFire);
+	InputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::StopFire);
+	InputComponent->BindAction("EquipKnife", IE_Pressed, this, &APlayerCharacter::EquipKnife);
+	InputComponent->BindAction("EquipPistol", IE_Pressed, this, &APlayerCharacter::EquipPistol);
+	InputComponent->BindAction("EquipRifle", IE_Pressed, this, &APlayerCharacter::EquipRifle);
+	//InputComponent->BindAction("EquipGrenade", IE_Pressed, this, &APlayerCharacter::EquipGrenade);
 
 	APlayerController* controller = GetController<APlayerController>();
 	if (nullptr != controller)
@@ -77,4 +85,29 @@ void APlayerCharacter::StartJump()
 void APlayerCharacter::StopJump()
 {
 	StopJumping();
+}
+
+void APlayerCharacter::StartFire()
+{
+	m_weaponUser->StartFire();
+}
+
+void APlayerCharacter::StopFire()
+{
+	m_weaponUser->StopFire();
+}
+
+void APlayerCharacter::EquipKnife()
+{
+	m_weaponUser->EquipWeapon(EWeaponSlotType::Knife);
+}
+
+void APlayerCharacter::EquipPistol()
+{
+	m_weaponUser->EquipWeapon(EWeaponSlotType::Pistol);
+}
+
+void APlayerCharacter::EquipRifle()
+{
+	m_weaponUser->EquipWeapon(EWeaponSlotType::Rifle);
 }

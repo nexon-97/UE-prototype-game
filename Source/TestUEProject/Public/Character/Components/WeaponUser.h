@@ -24,7 +24,7 @@ public:
 	void SetShooting(const bool shooting);
 
 	UFUNCTION(BlueprintCallable)
-	void EquipWeapon(AWeaponBase* weapon);
+	void EquipWeapon(const EWeaponSlotType slot);
 
 	UFUNCTION(BlueprintCallable)
 	void ReloadWeapon();
@@ -35,6 +35,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AWeaponBase* GetWeaponAtSlot(const EWeaponSlotType slot) const;
 
+	void StartFire();
+	void StopFire();
+
 public:
 	UPROPERTY(BlueprintReadOnly)
 	bool IsShooting = false;
@@ -44,4 +47,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	TMap<EWeaponSlotType, AWeaponBase*> WeaponSlots;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	TMap<EWeaponSlotType, FName> WeaponSlotSockets;
+
+	class UMeshComponent* ActorMesh = nullptr;
+
+private:
+	void AttachWeaponActorToOwner(AWeaponBase* weapon);
 };
