@@ -31,12 +31,6 @@ void AWeaponBase::BeginPlay()
 	FireSocket = weaponMesh->GetSocketByName(TEXT("MuzzleFlash"));
 }
 
-// Called every frame
-void AWeaponBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 bool AWeaponBase::CanShoot() const
 {
 	bool timerElapsed = !GetWorld()->GetTimerManager().IsTimerActive(ShootTimer);
@@ -102,6 +96,8 @@ void AWeaponBase::ShootInternal()
 				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Hit pawn!"));
 			}
 		}
+
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Cyan, TEXT("Weapon has shot!"));
 	}
 }
 

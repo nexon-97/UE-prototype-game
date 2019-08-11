@@ -1,4 +1,5 @@
 #include "Character/Components/WeaponUser.h"
+#include "Character/PlayerAnimInstance.h"
 #include "GameFramework/Pawn.h"
 #include "Components/InputComponent.h"
 
@@ -20,8 +21,6 @@ void UWeaponUser::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 	if (IsShooting && nullptr != EquippedWeapon)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Shoot"));
-
 		EquippedWeapon->Shoot();
 	}
 }
@@ -36,26 +35,44 @@ void UWeaponUser::SetShooting(const bool shooting)
 
 void UWeaponUser::EquipWeapon(const EWeaponSlotType slot)
 {
-	AWeaponBase* weapon = nullptr;
-	AWeaponBase** weaponPtr = WeaponSlots.Find(slot);
-	if (nullptr != weaponPtr)
+	if (nullptr != EquippedWeapon && EquippedWeapon->weaponSlotType == slot)
 	{
-		weapon = *weaponPtr;
+		UnequipWeapon();
 	}
-
-	if (weapon != EquippedWeapon)
+	else
 	{
-		if (nullptr != EquippedWeapon)
+		AWeaponBase* weapon = nullptr;
+		AWeaponBase** weaponPtr = WeaponSlots.Find(slot);
+		if (nullptr != weaponPtr)
 		{
-			// Un-equip weapon
+			weapon = *weaponPtr;
 		}
 
-		EquippedWeapon = weapon;
-
-		if (nullptr != EquippedWeapon)
+		if (weapon != EquippedWeapon)
 		{
-			
+			UnequipWeapon();
+
+			if (nullptr != weapon)
+			{
+				AttachWeaponActorToOwnerHands(weapon);
+				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Weapon equipped"));
+
+				EquippedWeapon = weapon;
+				EquippedWeaponChangedEvent.Execute(EquippedWeapon);
+			}
 		}
+	}
+}
+
+void UWeaponUser::UnequipWeapon()
+{
+	if (nullptr != EquippedWeapon)
+	{
+		// Un-equip weapon
+		AttachWeaponActorToOwnerSlot(EquippedWeapon);
+		EquippedWeaponChangedEvent.Execute(nullptr);
+
+		EquippedWeapon = nullptr;
 	}
 }
 
@@ -85,7 +102,7 @@ void UWeaponUser::SetWeaponAtSlot(const EWeaponSlotType slot, AWeaponBase* weapo
 	{
 		WeaponSlots.Add(slot, weapon);
 
-		AttachWeaponActorToOwner(weapon);
+		AttachWeaponActorToOwnerSlot(weapon);
 	}
 
 	// Emit event, that weapon at slot has changed
@@ -112,7 +129,7 @@ void UWeaponUser::StopFire()
 	SetShooting(false);
 }
 
-void UWeaponUser::AttachWeaponActorToOwner(AWeaponBase* weapon)
+void UWeaponUser::AttachWeaponActorToOwnerSlot(AWeaponBase* weapon)
 {
 	// Disable weapon physics
 	weapon->weaponCollision->SetSimulatePhysics(false);
@@ -131,4 +148,16 @@ void UWeaponUser::AttachWeaponActorToOwner(AWeaponBase* weapon)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Socket binding for weapon slot not found"));
 	}
+}
+
+void UWeaponUser::AttachWeaponActorToOwnerHands(AWeaponBase* weapon)
+{
+	// Disable weapon physics
+	weapon->weaponCollision->SetSimulatePhysics(false);
+	weapon->weaponMesh->SetSimulatePhysics(false);
+
+	// Attach weapon actor to a socket on owner
+	FName socketName = TEXT("EquippedPistolHost");
+	FAttachmentTransformRules attachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
+	weapon->AttachToComponent(ActorMesh, attachmentRules, socketName);
 }

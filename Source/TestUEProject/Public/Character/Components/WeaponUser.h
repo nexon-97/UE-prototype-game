@@ -27,6 +27,9 @@ public:
 	void EquipWeapon(const EWeaponSlotType slot);
 
 	UFUNCTION(BlueprintCallable)
+	void UnequipWeapon();
+
+	UFUNCTION(BlueprintCallable)
 	void ReloadWeapon();
 
 	UFUNCTION(BlueprintCallable)
@@ -53,6 +56,10 @@ public:
 
 	class UMeshComponent* ActorMesh = nullptr;
 
+	DECLARE_DELEGATE_OneParam(FEquippedWeaponChangedEvent, AWeaponBase*);
+	FEquippedWeaponChangedEvent EquippedWeaponChangedEvent;
+
 private:
-	void AttachWeaponActorToOwner(AWeaponBase* weapon);
+	void AttachWeaponActorToOwnerSlot(AWeaponBase* weapon);
+	void AttachWeaponActorToOwnerHands(AWeaponBase* weapon);
 };

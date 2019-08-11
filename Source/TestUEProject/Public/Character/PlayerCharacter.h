@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GenericCharacter.h"
+#include "WeaponBase.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -26,9 +27,12 @@ public:
 	void StopJump();
 	void StartFire();
 	void StopFire();
+	void ReloadWeapon();
 	void EquipKnife();
 	void EquipPistol();
 	void EquipRifle();
+
+	void OnEquippedWeaponChanged(AWeaponBase* weapon);
 
 private:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Weapon User Component", AllowPrivateAccess = "true"))
