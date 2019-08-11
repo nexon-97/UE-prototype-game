@@ -1,8 +1,15 @@
 #include "GenericCharacter.h"
+#include "Character/PlayerAnimInstance.h"
+
+#include "Engine.h"
 
 AGenericCharacter::AGenericCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	KillableComponent = CreateDefaultSubobject<UKillableComponent>(TEXT("Killable"));
+	KillableComponent->bEditableWhenInherited = true;
+	KillableComponent->ActorKilledEvent.BindUObject(this, &AGenericCharacter::OnKill);
 }
 
 void AGenericCharacter::BeginPlay()
@@ -20,7 +27,11 @@ void AGenericCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-float AGenericCharacter::GetHealth() const
+void AGenericCharacter::OnKill(AActor*)
 {
-	return m_health;
+	UPlayerAnimInstance* animInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+	if (nullptr != animInstance)
+	{
+		animInstance->bIsDead = true;
+	}
 }

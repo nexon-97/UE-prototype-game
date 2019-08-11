@@ -13,4 +13,7 @@ class TESTUEPROJECT_API UPlayerAnimInstance
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bIsEquippingWeapon = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bIsDead = false;
 };

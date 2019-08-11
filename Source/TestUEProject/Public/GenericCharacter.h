@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "KillableComponent.h"
 #include "GenericCharacter.generated.h"
 
 UCLASS()
@@ -24,9 +25,9 @@ public:
 	// Called to bind functionality to input
 	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION(BlueprintCallable)
-	float GetHealth() const;
+	void OnKill(AActor*);
 
-private:
-	float m_health = 100.f;
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (DisplayName = "Killable Component", AllowPrivateAccess = "true"))
+	UKillableComponent* KillableComponent = nullptr;
 };

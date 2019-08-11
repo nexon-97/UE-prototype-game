@@ -3,6 +3,7 @@
 #include "WeaponBase.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "KillableComponent.h"
 #include "Engine.h"
 
 const ECollisionChannel k_projectileCollisionChannel = ECollisionChannel::ECC_WorldDynamic;
@@ -90,14 +91,15 @@ void AWeaponBase::ShootInternal()
 		{
 			DrawDebugSolidBox(GetWorld(), hitResult.Location, FVector(5.f, 5.f, 5.f), FColor(255, 0, 0), false, 2.f);
 
-			auto pawnActor = Cast<APawn>(hitResult.GetActor());
-			if (nullptr != pawnActor)
+			TArray<UKillableComponent*> killables;
+			hitResult.GetActor()->GetComponents(killables, false);
+
+			if (killables.Num() > 0)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Hit pawn!"));
+				UKillableComponent* killable = *killables.begin();
+				killable->RemoveHealth(26.f);
 			}
 		}
-
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Cyan, TEXT("Weapon has shot!"));
 	}
 }
 
