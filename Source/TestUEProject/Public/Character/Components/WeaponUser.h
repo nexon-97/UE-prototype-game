@@ -38,6 +38,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AWeaponBase* GetWeaponAtSlot(const EWeaponSlotType slot) const;
 
+	UFUNCTION(BlueprintCallable)
+	bool HasAnyWeapon() const;
+
 	void StartFire();
 	void StopFire();
 
@@ -45,10 +48,10 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool IsShooting = false;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	AWeaponBase* EquippedWeapon = nullptr;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TMap<EWeaponSlotType, AWeaponBase*> WeaponSlots;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)

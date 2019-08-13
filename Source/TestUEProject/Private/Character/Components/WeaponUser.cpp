@@ -13,6 +13,19 @@ UWeaponUser::UWeaponUser()
 void UWeaponUser::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// If there are weapon slots assigned, actually attach them to the actor sockets
+	for (auto& weaponSlotData : WeaponSlots)
+	{
+		if (weaponSlotData.Value == EquippedWeapon)
+		{
+			AttachWeaponActorToOwnerHands(weaponSlotData.Value);
+		}
+		else
+		{
+			AttachWeaponActorToOwnerSlot(weaponSlotData.Value);
+		}
+	}
 }
 
 void UWeaponUser::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -117,6 +130,11 @@ AWeaponBase* UWeaponUser::GetWeaponAtSlot(const EWeaponSlotType slot) const
 	}
 
 	return nullptr;
+}
+
+bool UWeaponUser::HasAnyWeapon() const
+{
+	return WeaponSlots.Num() > 0;
 }
 
 void UWeaponUser::StartFire()
