@@ -7,7 +7,7 @@ bool UCombatModeCameraOffsetEffect::ModifyCamera(float DeltaTime, struct FMinima
 {
 	const FVector right = InOutPOV.Rotation.Quaternion().GetRightVector();
 	const FVector up = InOutPOV.Rotation.Quaternion().GetUpVector();
-	const FVector offset(60.f, 0.f, 50.f);
+	const FVector offset(50.f, 0.f, 0.f);
 
 	InOutPOV.Location += (right * offset.X + up * offset.Z);
 

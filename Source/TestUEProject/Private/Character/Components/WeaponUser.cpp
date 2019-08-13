@@ -58,7 +58,7 @@ void UWeaponUser::EquipWeapon(const EWeaponSlotType slot)
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Weapon equipped"));
 
 				EquippedWeapon = weapon;
-				EquippedWeaponChangedEvent.Execute(EquippedWeapon);
+				EquippedWeaponChangedEvent.Broadcast(EquippedWeapon);
 			}
 		}
 	}
@@ -70,7 +70,7 @@ void UWeaponUser::UnequipWeapon()
 	{
 		// Un-equip weapon
 		AttachWeaponActorToOwnerSlot(EquippedWeapon);
-		EquippedWeaponChangedEvent.Execute(nullptr);
+		EquippedWeaponChangedEvent.Broadcast(nullptr);
 
 		EquippedWeapon = nullptr;
 	}
@@ -135,6 +135,8 @@ void UWeaponUser::AttachWeaponActorToOwnerSlot(AWeaponBase* weapon)
 	weapon->weaponCollision->SetSimulatePhysics(false);
 	weapon->weaponMesh->SetSimulatePhysics(false);
 
+	weapon->CanBePicked = false;
+
 	// Attach weapon actor to a socket on owner
 	FName* socketName = WeaponSlotSockets.Find(weapon->weaponSlotType);
 	if (nullptr != socketName)
@@ -155,6 +157,8 @@ void UWeaponUser::AttachWeaponActorToOwnerHands(AWeaponBase* weapon)
 	// Disable weapon physics
 	weapon->weaponCollision->SetSimulatePhysics(false);
 	weapon->weaponMesh->SetSimulatePhysics(false);
+
+	weapon->CanBePicked = false;
 
 	// Attach weapon actor to a socket on owner
 	FName socketName = TEXT("EquippedPistolHost");

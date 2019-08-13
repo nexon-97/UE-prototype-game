@@ -26,7 +26,7 @@ APlayerCharacter::APlayerCharacter()
 	GetMesh()->SetAnimInstanceClass(UPlayerAnimInstance::StaticClass());
 
 	m_weaponUser->ActorMesh = Cast<UMeshComponent>(GetMesh());
-	m_weaponUser->EquippedWeaponChangedEvent.BindUObject(this, &APlayerCharacter::OnEquippedWeaponChanged);
+	m_weaponUser->EquippedWeaponChangedEvent.AddUObject(this, &APlayerCharacter::OnEquippedWeaponChanged);
 }
 
 void APlayerCharacter::BeginPlay()

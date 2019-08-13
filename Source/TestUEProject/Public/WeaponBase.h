@@ -57,6 +57,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Weapon Params", meta = (DisplayName = "Clip size"))
 	int clipSize = 30;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Can be picked"))
+	// Indicates if the weapon can be targeted by AI for picking
+	bool CanBePicked = true;
+
 private:
 	int ammoCount = 0;
 	FTimerHandle ShootTimer;

@@ -5,6 +5,8 @@
 #include "Camera/CombatModeCameraOffsetEffect.h"
 #include "ProtoPlayerController.generated.h"
 
+class AWeaponBase;
+
 UCLASS()
 class TESTUEPROJECT_API AProtoPlayerController
 	: public APlayerController
@@ -20,6 +22,11 @@ public:
 
 protected:
 	void InitCameraModifiers();
+
+	void OnPossess(APawn* aPawn) override;
+	void OnUnPossess() override;
+
+	void OnEquippedWeaponChanged(AWeaponBase* weapon);
 
 protected:
 	UCombatModeCameraOffsetEffect* CombatModeCameraEffect = nullptr;

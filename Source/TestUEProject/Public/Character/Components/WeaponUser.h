@@ -54,9 +54,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	TMap<EWeaponSlotType, FName> WeaponSlotSockets;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UMeshComponent* ActorMesh = nullptr;
 
-	DECLARE_DELEGATE_OneParam(FEquippedWeaponChangedEvent, AWeaponBase*);
+	DECLARE_MULTICAST_DELEGATE_OneParam(FEquippedWeaponChangedEvent, AWeaponBase*);
+
+	//UPROPERTY(BlueprintAssignable)
 	FEquippedWeaponChangedEvent EquippedWeaponChangedEvent;
 
 private:
