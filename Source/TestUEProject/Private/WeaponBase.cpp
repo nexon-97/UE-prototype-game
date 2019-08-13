@@ -67,8 +67,8 @@ void AWeaponBase::ShootInternal()
 		
 		// Run line trace to determine target to hit
 		FHitResult hitResult;
-		FVector traceStart = socketTransform.GetLocation();
-		const float traceDistance = 30000.f;
+		FVector fakeTraceStart = socketTransform.GetLocation();
+		const float traceDistance = 30000.f; // 300 Meters ahead
 		//FVector traceEnd = traceStart + socketTransform.GetRotation().GetForwardVector() * traceDistance;
 		FVector deprojectedLocation;
 		FVector deprojectedDirection;
@@ -77,10 +77,8 @@ void AWeaponBase::ShootInternal()
 		GetWorld()->GetGameViewport()->GetViewportSize(viewportSize);
 		controller->DeprojectScreenPositionToWorld(viewportSize[0] * 0.5f, viewportSize[1] * 0.5f, deprojectedLocation, deprojectedDirection);
 
+		FVector traceStart = deprojectedLocation;
 		FVector traceEnd = deprojectedLocation + deprojectedDirection * traceDistance;
-		
-		//WorldRay = Camera.ViewportPointToRay(viewPoint2D);
-		DrawDebugLine(GetWorld(), traceStart, traceEnd, FColor(255, 0, 0), false, 2.f, 0, 2);
 
 		FCollisionQueryParams queryParams;
 		queryParams.AddIgnoredActor(GetOwner());
@@ -89,6 +87,7 @@ void AWeaponBase::ShootInternal()
 		bool traceSucceeded = GetWorld()->LineTraceSingleByChannel(hitResult, traceStart, traceEnd, k_projectileCollisionChannel, queryParams);
 		if (traceSucceeded)
 		{
+			DrawDebugLine(GetWorld(), fakeTraceStart, hitResult.Location, FColor(255, 0, 0), false, 2.f, 0, 2);
 			DrawDebugSolidBox(GetWorld(), hitResult.Location, FVector(5.f, 5.f, 5.f), FColor(255, 0, 0), false, 2.f);
 
 			TArray<UKillableComponent*> killables;
@@ -99,6 +98,10 @@ void AWeaponBase::ShootInternal()
 				UKillableComponent* killable = *killables.begin();
 				killable->RemoveHealth(26.f);
 			}
+		}
+		else
+		{
+			DrawDebugLine(GetWorld(), fakeTraceStart, traceEnd, FColor(255, 0, 0), false, 2.f, 0, 2);
 		}
 	}
 }

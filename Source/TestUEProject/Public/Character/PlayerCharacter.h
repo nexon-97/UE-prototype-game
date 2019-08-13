@@ -34,6 +34,9 @@ public:
 
 	void OnEquippedWeaponChanged(AWeaponBase* weapon);
 
+protected:
+	void BeginPlay() override;
+
 private:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Weapon User Component", AllowPrivateAccess = "true"))
 	class UWeaponUser* m_weaponUser = nullptr;

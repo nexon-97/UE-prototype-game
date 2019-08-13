@@ -9,7 +9,7 @@ AGenericCharacter::AGenericCharacter()
 
 	KillableComponent = CreateDefaultSubobject<UKillableComponent>(TEXT("Killable"));
 	KillableComponent->bEditableWhenInherited = true;
-	KillableComponent->ActorKilledEvent.BindUObject(this, &AGenericCharacter::OnKill);
+	KillableComponent->ActorKilledEvent.AddDynamic(this, &AGenericCharacter::OnKill);
 }
 
 void AGenericCharacter::BeginPlay()

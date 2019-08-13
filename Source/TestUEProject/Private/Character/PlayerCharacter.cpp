@@ -29,6 +29,11 @@ APlayerCharacter::APlayerCharacter()
 	m_weaponUser->EquippedWeaponChangedEvent.BindUObject(this, &APlayerCharacter::OnEquippedWeaponChanged);
 }
 
+void APlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
@@ -40,6 +45,8 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputCom
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::StartJump);
 	InputComponent->BindAction("Jump", IE_Released, this, &APlayerCharacter::StopJump);
+
+	// Setup weapon user input
 	InputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::StartFire);
 	InputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::StopFire);
 	InputComponent->BindAction("Reload", IE_Pressed, this, &APlayerCharacter::ReloadWeapon);
@@ -47,15 +54,6 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputCom
 	InputComponent->BindAction("EquipPistol", IE_Pressed, this, &APlayerCharacter::EquipPistol);
 	InputComponent->BindAction("EquipRifle", IE_Pressed, this, &APlayerCharacter::EquipRifle);
 	//InputComponent->BindAction("EquipGrenade", IE_Pressed, this, &APlayerCharacter::EquipGrenade);
-
-	APlayerController* controller = GetController<APlayerController>();
-	if (nullptr != controller)
-	{
-		controller->PlayerCameraManager->ViewPitchMin = -50.f;
-		controller->PlayerCameraManager->ViewPitchMax = 0.f;
-	}
-
-	// Setup weapon user input
 }
 
 void APlayerCharacter::MoveForward(float AxisValue)
@@ -128,7 +126,7 @@ void APlayerCharacter::EquipRifle()
 
 void APlayerCharacter::OnEquippedWeaponChanged(AWeaponBase* weapon)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Event fired"));
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Equipped Weapon Changed"));
 
 	UPlayerAnimInstance* animInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 	if (nullptr != animInstance)

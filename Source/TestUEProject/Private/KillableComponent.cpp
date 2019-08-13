@@ -26,7 +26,7 @@ void UKillableComponent::RemoveHealth(const float hp)
 		bIsKilled = true;
 
 		// Send kill event
-		ActorKilledEvent.ExecuteIfBound(GetOwner());
+		ActorKilledEvent.Broadcast(GetOwner());
 
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Actor killed!"));
 	}

@@ -33,6 +33,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bIsInvulnerable = false;
 
-	DECLARE_DELEGATE_OneParam(FActorKilledEvent, AActor*);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActorKilledEvent, AActor*, KilledActor);
+
+	UPROPERTY(BlueprintAssignable)
 	FActorKilledEvent ActorKilledEvent;
 };
