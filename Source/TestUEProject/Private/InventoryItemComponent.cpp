@@ -15,17 +15,27 @@ UInventoryItemComponent::UInventoryItemComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-const FString& UInventoryItemComponent::GetInventoryName() const
+bool UInventoryItemComponent::GetItemDef(FInventoryItemDef& itemDef) const
 {
 	if (nullptr != g_inventoryDB)
 	{
 		FString context = "CONTEXT";
-		FInventoryItemDef* itemDef = g_inventoryDB->FindRow<FInventoryItemDef>(FName(*m_itemInfoId), context, false);
+		FInventoryItemDef* itemDefPtr = g_inventoryDB->FindRow<FInventoryItemDef>(FName(*m_itemInfoId), context, false);
 
-		if (nullptr != itemDef)
-		{
-			return itemDef->InventoryName;
-		}
+		itemDef = *itemDefPtr;
+		return true;
+	}
+
+	return false;
+}
+
+const FString& UInventoryItemComponent::GetInventoryName() const
+{
+	FInventoryItemDef itemDef;
+
+	if (GetItemDef(itemDef))
+	{
+		return itemDef.InventoryName;
 	}
 
 	return k_defaultItemName;

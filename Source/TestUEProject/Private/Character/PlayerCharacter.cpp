@@ -3,6 +3,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Character/Components/WeaponUser.h"
+#include "Character/Components/InventoryComponent.h"
 #include "Character/PlayerAnimInstance.h"
 #include "Components/InputComponent.h"
 
@@ -27,6 +28,8 @@ APlayerCharacter::APlayerCharacter()
 
 	m_weaponUser->ActorMesh = Cast<UMeshComponent>(GetMesh());
 	m_weaponUser->EquippedWeaponChangedEvent.AddUObject(this, &APlayerCharacter::OnEquippedWeaponChanged);
+
+	m_inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 }
 
 void APlayerCharacter::BeginPlay()

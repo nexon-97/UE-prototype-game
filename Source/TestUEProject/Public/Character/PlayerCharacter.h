@@ -46,4 +46,7 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Camera", AllowPrivateAccess = "true"))
 	class UCameraComponent* m_camera = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Inventory", AllowPrivateAccess = "true"))
+	class UInventoryComponent* m_inventory = nullptr;
 };

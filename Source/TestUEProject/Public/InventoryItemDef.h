@@ -29,4 +29,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftObjectPtr<UTexture> InventoryIcon;
+
+	/* Actor type, which is created when the item is added to the game world as physical object */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AActor> WorldActorType;
+
+	/* Means item has state and can be destroyed */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsBreakable;
 };

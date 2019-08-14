@@ -14,13 +14,16 @@ class TESTUEPROJECT_API UInventoryItemComponent
 public:	
 	UInventoryItemComponent();
 
+	UFUNCTION(BlueprintCallable)
+	bool GetItemDef(FInventoryItemDef& itemDef) const;
+
+	UFUNCTION(BlueprintCallable)
+	const FString& GetInventoryName() const;
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Item info ID"))
 	FString m_itemInfoId;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Units"))
 	int m_count;
-
-	UFUNCTION(BlueprintCallable)
-	const FString& GetInventoryName() const;
 };

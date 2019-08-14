@@ -17,7 +17,7 @@ void UKillableComponent::AddHealth(const float hp)
 
 void UKillableComponent::RemoveHealth(const float hp)
 {
-	if (bIsKilled)
+	if (bIsKilled || bIsInvulnerable)
 		return;
 
 	if (hp >= Health)
