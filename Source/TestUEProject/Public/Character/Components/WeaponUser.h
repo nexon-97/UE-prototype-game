@@ -30,9 +30,6 @@ public:
 	void UnequipWeapon();
 
 	UFUNCTION(BlueprintCallable)
-	void ReloadWeapon();
-
-	UFUNCTION(BlueprintCallable)
 	void SetWeaponAtSlot(const EWeaponSlotType slot, AWeaponBase* weapon);
 
 	UFUNCTION(BlueprintCallable)

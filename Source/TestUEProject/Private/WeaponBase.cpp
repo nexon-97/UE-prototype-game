@@ -108,9 +108,6 @@ void AWeaponBase::ShootInternal()
 
 int AWeaponBase::LoadClip(int loadCount)
 {
-	// Do some shoot action
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("LoadClip"));
-
 	const int remainingToFullLoad = clipSize - ammoCount;
 	int ammoLoaded = FMath::Min(remainingToFullLoad, loadCount);
 	ammoCount += ammoLoaded;

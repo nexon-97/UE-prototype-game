@@ -92,14 +92,6 @@ void UWeaponUser::UnequipWeapon()
 	}
 }
 
-void UWeaponUser::ReloadWeapon()
-{
-	if (nullptr != EquippedWeapon)
-	{
-		EquippedWeapon->LoadClip(1);
-	}
-}
-
 void UWeaponUser::SetWeaponAtSlot(const EWeaponSlotType slot, AWeaponBase* weapon)
 {
 	AWeaponBase** currentWeaponAtSlot = WeaponSlots.Find(slot);

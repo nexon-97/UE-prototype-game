@@ -34,6 +34,12 @@ public:
 
 	void AddItem(UInventoryItemComponent* itemComp);
 
+	UFUNCTION(BlueprintCallable)
+	bool FindItemById(const FName& itemId, FInventoryItemEntry& outItem, int32& index);
+
+	UFUNCTION(BlueprintCallable)
+	FInventoryItemEntry& GetItem(int32 index);
+
 protected:
 	virtual void BeginPlay() override;		
 

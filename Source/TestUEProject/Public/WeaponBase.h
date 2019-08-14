@@ -49,18 +49,23 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Weapon Params", meta=(DisplayName="Weapon slot type"))
 	EWeaponSlotType weaponSlotType = EWeaponSlotType::Knife;
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Weapon Params", meta = (DisplayName = "Shoot frequency"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Params", meta = (DisplayName = "Shoot frequency"))
 	float shootFrequency = 1.f;
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Weapon Params", meta = (DisplayName = "Clip size"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Params", meta = (DisplayName = "Clip size"))
 	int clipSize = 30;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Can be picked"))
 	// Indicates if the weapon can be targeted by AI for picking
 	bool CanBePicked = true;
 
+	/* Inventory ID of the weapon */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Inventory ID"))
 	FName InventoryId;
+
+	/* Inventory ID of ammo, that can be used for this weapon */
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Ammo type inventory ID"))
+	FName AmmoTypeId;
 
 private:
 	int ammoCount = 0;

@@ -6,6 +6,7 @@
 #include "Character/Components/InventoryComponent.h"
 #include "Character/PlayerAnimInstance.h"
 #include "Components/InputComponent.h"
+#include "InventoryItemDef.h"
 
 #include "Engine.h"
 
@@ -109,7 +110,17 @@ void APlayerCharacter::StopFire()
 
 void APlayerCharacter::ReloadWeapon()
 {
-	m_weaponUser->ReloadWeapon();
+	if (nullptr != m_weaponUser->EquippedWeapon)
+	{
+		// Find ammo in inventory
+		FInventoryItemEntry ammoItemEntry;
+		int32 index;
+		if (m_inventory->FindItemById(m_weaponUser->EquippedWeapon->AmmoTypeId, ammoItemEntry, index))
+		{
+			int loadedCount = m_weaponUser->EquippedWeapon->LoadClip(ammoItemEntry.Quantity);
+			m_inventory->GetItem(index).Quantity -= loadedCount;
+		}
+	}
 }
 
 void APlayerCharacter::EquipKnife()
