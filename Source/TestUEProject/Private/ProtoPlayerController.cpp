@@ -1,5 +1,6 @@
 #include "ProtoPlayerController.h"
 #include "Character/Components/WeaponUser.h"
+#include "GameHUD.h"
 
 #include "Engine.h"
 
@@ -32,6 +33,22 @@ void AProtoPlayerController::OnPossess(APawn* aPawn)
 void AProtoPlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
+}
+
+void AProtoPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	InputComponent->BindAction("Inventory", IE_Pressed, this, &AProtoPlayerController::OnInventoryToggle);
+}
+
+void AProtoPlayerController::OnInventoryToggle()
+{
+	AGameHUD* hud = Cast<AGameHUD>(GetHUD());
+	if (nullptr != hud)
+	{
+		hud->OnOpenInventory();
+	}
 }
 
 void AProtoPlayerController::OnEquippedWeaponChanged(AWeaponBase* weapon)

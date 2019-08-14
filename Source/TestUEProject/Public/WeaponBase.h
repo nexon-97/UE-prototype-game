@@ -59,6 +59,9 @@ public:
 	// Indicates if the weapon can be targeted by AI for picking
 	bool CanBePicked = true;
 
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Inventory ID"))
+	FName InventoryId;
+
 private:
 	int ammoCount = 0;
 	FTimerHandle ShootTimer;

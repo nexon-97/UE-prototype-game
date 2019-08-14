@@ -28,6 +28,10 @@ protected:
 
 	void OnEquippedWeaponChanged(AWeaponBase* weapon);
 
+	void SetupInputComponent() override;
+
+	void OnInventoryToggle();
+
 protected:
 	UCombatModeCameraOffsetEffect* CombatModeCameraEffect = nullptr;
 };
