@@ -17,6 +17,9 @@ void UWeaponUser::BeginPlay()
 	// If there are weapon slots assigned, actually attach them to the actor sockets
 	for (auto& weaponSlotData : WeaponSlots)
 	{
+		if (nullptr == weaponSlotData.Value)
+			continue;
+		
 		if (weaponSlotData.Value == EquippedWeapon)
 		{
 			AttachWeaponActorToOwnerHands(weaponSlotData.Value);

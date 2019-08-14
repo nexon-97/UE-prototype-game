@@ -22,7 +22,7 @@ public:
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Item info ID"))
-	FString m_itemInfoId;
+	FName m_itemInfoId;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Units"))
 	int m_count;

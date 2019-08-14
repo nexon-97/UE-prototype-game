@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "EWeaponSlotType.h"
-#include "InventoryItem.h"
 #include "WeaponBase.generated.h"
 
 class USkeletalMeshComponent;
@@ -12,7 +11,6 @@ class UBoxComponent;
 UCLASS()
 class TESTUEPROJECT_API AWeaponBase 
 	: public AActor
-	, public IInventoryItem
 {
 	GENERATED_BODY()
 	

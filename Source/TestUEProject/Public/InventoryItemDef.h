@@ -17,7 +17,7 @@ public:
 
 	/* Unique string id assigned to an item */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Id;
+	FName Id;
 
 	/* Displayed inventory name */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
