@@ -31,11 +31,17 @@ public:
 	void EquipKnife();
 	void EquipPistol();
 	void EquipRifle();
+	void OnPickItem();
 
 	void OnEquippedWeaponChanged(AWeaponBase* weapon);
 
+	void Tick(float DeltaTime) override;
+
 protected:
 	void BeginPlay() override;
+
+	/* Refreshes world actor, that the character is currently looking at, and able to interact with */
+	void RefreshFocusedWorldItem();
 
 private:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Weapon User Component", AllowPrivateAccess = "true"))
@@ -49,4 +55,7 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Inventory", AllowPrivateAccess = "true"))
 	class UInventoryComponent* m_inventory = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Focused world actor", AllowPrivateAccess = "true"))
+	AActor* FocusedWorldActor = nullptr;
 };

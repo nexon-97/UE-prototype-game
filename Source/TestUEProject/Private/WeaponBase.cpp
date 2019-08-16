@@ -63,7 +63,7 @@ void AWeaponBase::ShootInternal()
 
 	if (nullptr != FireSocket)
 	{
-		auto socketTransform = FireSocket->GetSocketTransform(weaponMesh);
+		FTransform socketTransform = FireSocket->GetSocketTransform(weaponMesh);
 		
 		// Run line trace to determine target to hit
 		FHitResult hitResult;

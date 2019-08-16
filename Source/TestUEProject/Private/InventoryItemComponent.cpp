@@ -18,7 +18,7 @@ bool UInventoryItemComponent::GetItemDef(FInventoryItemDef& itemDef) const
 	return gameMode->InventoryItemsDB->GetItemDef(m_itemInfoId, itemDef);
 }
 
-const FString& UInventoryItemComponent::GetInventoryName() const
+FString UInventoryItemComponent::GetInventoryName() const
 {
 	FInventoryItemDef itemDef;
 	if (GetItemDef(itemDef))

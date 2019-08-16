@@ -7,6 +7,7 @@
 #include "Character/PlayerAnimInstance.h"
 #include "Components/InputComponent.h"
 #include "InventoryItemDef.h"
+#include "InventoryItemComponent.h"
 
 #include "Engine.h"
 
@@ -38,6 +39,13 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	RefreshFocusedWorldItem();
+}
+
 void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
@@ -57,6 +65,7 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputCom
 	InputComponent->BindAction("EquipKnife", IE_Pressed, this, &APlayerCharacter::EquipKnife);
 	InputComponent->BindAction("EquipPistol", IE_Pressed, this, &APlayerCharacter::EquipPistol);
 	InputComponent->BindAction("EquipRifle", IE_Pressed, this, &APlayerCharacter::EquipRifle);
+	InputComponent->BindAction("Pick", IE_Pressed, this, &APlayerCharacter::OnPickItem);
 	//InputComponent->BindAction("EquipGrenade", IE_Pressed, this, &APlayerCharacter::EquipGrenade);
 }
 
@@ -138,6 +147,22 @@ void APlayerCharacter::EquipRifle()
 	m_weaponUser->EquipWeapon(EWeaponSlotType::Rifle);
 }
 
+void APlayerCharacter::OnPickItem()
+{
+	if (nullptr != FocusedWorldActor)
+	{
+		UInventoryItemComponent* inventoryItemComp = Cast<UInventoryItemComponent>(FocusedWorldActor->GetComponentByClass(UInventoryItemComponent::StaticClass()));
+		if (nullptr != inventoryItemComp)
+		{
+			m_inventory->AddItem(inventoryItemComp);
+
+			// Destroy world actor
+			FocusedWorldActor->Destroy();
+			FocusedWorldActor = nullptr;
+		}
+	}
+}
+
 void APlayerCharacter::OnEquippedWeaponChanged(AWeaponBase* weapon)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Equipped Weapon Changed"));
@@ -146,5 +171,35 @@ void APlayerCharacter::OnEquippedWeaponChanged(AWeaponBase* weapon)
 	if (nullptr != animInstance)
 	{
 		animInstance->bIsEquippingWeapon = (nullptr != weapon);
+	}
+}
+
+void APlayerCharacter::RefreshFocusedWorldItem()
+{
+	FCollisionQueryParams queryParams;
+	queryParams.AddIgnoredActor(this);
+
+	FHitResult hitResult;
+
+	FVector deprojectedLocation;
+	FVector deprojectedDirection;
+	APlayerController* controller = Cast<APlayerController>(GetController());
+	FVector2D viewportSize;
+	GetWorld()->GetGameViewport()->GetViewportSize(viewportSize);
+	controller->DeprojectScreenPositionToWorld(viewportSize[0] * 0.5f, viewportSize[1] * 0.5f, deprojectedLocation, deprojectedDirection);
+
+	FVector traceStart = deprojectedLocation;
+	const float traceDistance = 1000.f;
+	const ECollisionChannel traceCollisionChannel = ECollisionChannel::ECC_WorldDynamic;
+	FVector traceEnd = deprojectedLocation + deprojectedDirection * traceDistance;
+
+	bool traceSucceeded = GetWorld()->LineTraceSingleByChannel(hitResult, traceStart, traceEnd, traceCollisionChannel, queryParams);
+	if (traceSucceeded)
+	{
+		FocusedWorldActor = hitResult.GetActor();
+	}
+	else
+	{
+		FocusedWorldActor = nullptr;
 	}
 }

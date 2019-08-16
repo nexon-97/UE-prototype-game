@@ -18,7 +18,7 @@ public:
 	bool GetItemDef(FInventoryItemDef& itemDef) const;
 
 	UFUNCTION(BlueprintCallable)
-	const FString& GetInventoryName() const;
+	FString GetInventoryName() const;
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Item info ID"))
