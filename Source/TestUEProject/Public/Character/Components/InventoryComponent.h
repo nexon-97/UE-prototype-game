@@ -9,13 +9,13 @@ struct FInventoryItemEntry
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FName ItemId;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int32 Quantity;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	float State = 100.f;
 };
 
@@ -34,14 +34,21 @@ public:
 
 	void AddItem(UInventoryItemComponent* itemComp);
 
+	/* Finds item index by item inventory id */
 	UFUNCTION(BlueprintCallable)
-	bool FindItemById(const FName& itemId, FInventoryItemEntry& outItem, int32& index);
+	int32 FindItemIndexById(const FName& itemId);
 
+	/* Returns item entry copy by index */
 	UFUNCTION(BlueprintCallable)
-	FInventoryItemEntry& GetItem(int32 index);
+	FInventoryItemEntry GetItemEntry(int32 index) const;
 
-protected:
-	virtual void BeginPlay() override;		
+	/* Adds quantity to item at index */
+	UFUNCTION(BlueprintCallable)
+	void AddItemQuantity(int32 index, int32 quantity);
+
+	/* Removes given quantity from item at index */
+	UFUNCTION(BlueprintCallable)
+	void RemoveItemQuantity(int32 index, int32 quantity);
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

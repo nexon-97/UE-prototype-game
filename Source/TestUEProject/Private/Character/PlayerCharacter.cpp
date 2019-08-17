@@ -122,12 +122,12 @@ void APlayerCharacter::ReloadWeapon()
 	if (nullptr != m_weaponUser->EquippedWeapon)
 	{
 		// Find ammo in inventory
-		FInventoryItemEntry ammoItemEntry;
-		int32 index;
-		if (m_inventory->FindItemById(m_weaponUser->EquippedWeapon->AmmoTypeId, ammoItemEntry, index))
+		int32 index = m_inventory->FindItemIndexById(m_weaponUser->EquippedWeapon->AmmoTypeId);
+		if (-1 != index)
 		{
+			FInventoryItemEntry ammoItemEntry = m_inventory->GetItemEntry(index);
 			int loadedCount = m_weaponUser->EquippedWeapon->LoadClip(ammoItemEntry.Quantity);
-			m_inventory->GetItem(index).Quantity -= loadedCount;
+			m_inventory->RemoveItemQuantity(index, loadedCount);
 		}
 	}
 }
