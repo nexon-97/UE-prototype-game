@@ -32,6 +32,7 @@ public:
 	void EquipPistol();
 	void EquipRifle();
 	void OnPickItem();
+	void OnThrowItem();
 
 	void OnEquippedWeaponChanged(AWeaponBase* weapon);
 

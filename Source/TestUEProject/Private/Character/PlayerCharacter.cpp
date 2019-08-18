@@ -66,6 +66,7 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputCom
 	InputComponent->BindAction("EquipPistol", IE_Pressed, this, &APlayerCharacter::EquipPistol);
 	InputComponent->BindAction("EquipRifle", IE_Pressed, this, &APlayerCharacter::EquipRifle);
 	InputComponent->BindAction("Pick", IE_Pressed, this, &APlayerCharacter::OnPickItem);
+	InputComponent->BindAction("Throw", IE_Pressed, this, &APlayerCharacter::OnThrowItem);
 	//InputComponent->BindAction("EquipGrenade", IE_Pressed, this, &APlayerCharacter::EquipGrenade);
 }
 
@@ -160,6 +161,14 @@ void APlayerCharacter::OnPickItem()
 			FocusedWorldActor->Destroy();
 			FocusedWorldActor = nullptr;
 		}
+	}
+}
+
+void APlayerCharacter::OnThrowItem()
+{
+	if (nullptr != m_weaponUser->EquippedWeapon)
+	{
+		m_weaponUser->UnequipWeapon(EWeaponUnequipMethod::Throw);
 	}
 }
 

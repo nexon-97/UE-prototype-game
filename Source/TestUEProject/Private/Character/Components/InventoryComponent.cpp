@@ -1,5 +1,6 @@
 #include "InventoryComponent.h"
 #include "InventoryItemComponent.h"
+#include "ProtoGameModeBase.h"
 
 #include <Engine.h>
 
@@ -20,8 +21,34 @@ void UInventoryComponent::AddItem(const FInventoryItemEntry& itemData)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Trying to add item with invalid quantity to inventory!"));
 		return;
 	}
-		
-	Items.Add(itemData);
+
+	AProtoGameModeBase* gameMode = GetWorld()->GetAuthGameMode<AProtoGameModeBase>();
+	FInventoryItemDef itemDef;
+	if (gameMode->InventoryItemsDB->GetItemDef(itemData.ItemId, itemDef))
+	{
+		if (itemDef.bIsBreakable)
+		{
+			Items.Add(itemData);
+		}
+		else
+		{
+			// Not breakable, so can be stacked
+			auto predicate = [&itemData](const FInventoryItemEntry& item)
+			{
+				return item.ItemId == itemData.ItemId;
+			};
+			FInventoryItemEntry* arrayItemPtr = Items.FindByPredicate(predicate);
+
+			if (nullptr != arrayItemPtr)
+			{
+				arrayItemPtr->Quantity += itemData.Quantity;
+			}
+			else
+			{
+				Items.Add(itemData);
+			}
+		}
+	}
 }
 
 void UInventoryComponent::AddItem(UInventoryItemComponent* itemComp)

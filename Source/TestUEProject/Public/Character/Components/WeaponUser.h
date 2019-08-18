@@ -5,6 +5,17 @@
 #include "WeaponBase.h"
 #include "WeaponUser.generated.h"
 
+UENUM(BlueprintType)
+enum class EWeaponUnequipMethod : uint8
+{
+	HideToInventory UMETA(DisplayName = "Hide to inventory"),
+	LeaveAtSlot UMETA(DisplayName = "Leave at slot"),
+	Throw UMETA(DisplayName = "Throw"),
+};
+
+/*
+* @brief Weapon user handles several weapon slots, and single equipped weapon, which is actually used
+*/
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class TESTUEPROJECT_API UWeaponUser
 	: public UActorComponent
@@ -27,10 +38,10 @@ public:
 	void EquipWeapon(const EWeaponSlotType slot);
 
 	UFUNCTION(BlueprintCallable)
-	void UnequipWeapon();
+	void UnequipWeapon(EWeaponUnequipMethod unequipMethod = EWeaponUnequipMethod::HideToInventory);
 
 	UFUNCTION(BlueprintCallable)
-	void SetWeaponAtSlot(const EWeaponSlotType slot, AWeaponBase* weapon);
+	void SetWeaponAtSlot(const EWeaponSlotType slot, AWeaponBase* weapon, EWeaponUnequipMethod unequipMethod = EWeaponUnequipMethod::HideToInventory);
 
 	UFUNCTION(BlueprintCallable)
 	AWeaponBase* GetWeaponAtSlot(const EWeaponSlotType slot) const;
@@ -65,4 +76,5 @@ public:
 private:
 	void AttachWeaponActorToOwnerSlot(AWeaponBase* weapon);
 	void AttachWeaponActorToOwnerHands(AWeaponBase* weapon);
+	void ThrowWeapon(AWeaponBase* weapon);
 };

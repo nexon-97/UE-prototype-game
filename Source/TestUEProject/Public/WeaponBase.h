@@ -7,6 +7,7 @@
 
 class USkeletalMeshComponent;
 class UBoxComponent;
+class UInventoryItemComponent;
 
 UCLASS()
 class TESTUEPROJECT_API AWeaponBase 
@@ -45,6 +46,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	UBoxComponent* weaponCollision;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	UInventoryItemComponent* InventoryItemData;
 
 	/* Inventory ID of the weapon */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Inventory ID"))

@@ -1,6 +1,7 @@
 #include "WeaponBase.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "InventoryItemComponent.h"
 #include "KillableComponent.h"
 #include "Engine.h"
 
@@ -18,6 +19,11 @@ AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer)
 	weaponCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("WeaponCollision"));
 	weaponCollision->SetupAttachment(RootComponent);
 	weaponCollision->bEditableWhenInherited = true;
+
+	InventoryItemData = CreateDefaultSubobject<UInventoryItemComponent>(TEXT("InventoryItemData"));
+	InventoryItemData->bEditableWhenInherited = true;
+	InventoryItemData->m_count = 1;
+	InventoryItemData->m_itemInfoId = InventoryId;
 }
 
 // Called when the game starts or when spawned
