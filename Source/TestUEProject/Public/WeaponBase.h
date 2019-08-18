@@ -40,11 +40,19 @@ protected:
 	virtual void ShootInternal();
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	USkeletalMeshComponent* weaponMesh;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	UBoxComponent* weaponCollision;
+
+	/* Inventory ID of the weapon */
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Inventory ID"))
+	FName InventoryId;
+
+	/* Inventory ID of ammo, that can be used for this weapon */
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Ammo type inventory ID"))
+	FName AmmoTypeId;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Weapon Params", meta=(DisplayName="Weapon slot type"))
 	EWeaponSlotType weaponSlotType = EWeaponSlotType::Knife;
@@ -55,17 +63,13 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Weapon Params", meta = (DisplayName = "Clip size"))
 	int clipSize = 30;
 
+	/* Weapon state in percents. 100 is totally fine state, 0 is broken state. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Health State"))
+	float WeaponState = 100.f;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Can be picked"))
 	// Indicates if the weapon can be targeted by AI for picking
 	bool CanBePicked = true;
-
-	/* Inventory ID of the weapon */
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Inventory ID"))
-	FName InventoryId;
-
-	/* Inventory ID of ammo, that can be used for this weapon */
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Ammo type inventory ID"))
-	FName AmmoTypeId;
 
 private:
 	int ammoCount = 0;
