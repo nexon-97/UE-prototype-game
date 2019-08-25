@@ -20,10 +20,29 @@ void UInventoryWidget::PopulateInventory()
 
 	for (const FInventoryItemEntry& itemEntry : InventoryComp->Items)
 	{
-		UUserWidget* itemWidget = CreateWidget<UUserWidget>(GetOwningPlayer(), ItemWidgetClass);
+		UInventoryItemWidget* itemWidget = CreateWidget<UInventoryItemWidget>(GetOwningPlayer(), ItemWidgetClass);
+		itemWidget->SetItemEntry(itemEntry);
 		UVerticalBoxSlot* slot = Cast<UVerticalBoxSlot>(ItemsHostWidget->AddChild(itemWidget));
 
 		ItemsWidgets.Add(itemWidget);
 	}
 	ItemsHostWidget->InvalidateLayoutAndVolatility();
+
+	for (auto widgetData : WeaponSlotWidgets)
+	{
+		AWeaponBase* weapon = WeaponUserComp->GetWeaponAtSlot(widgetData.Key);
+		bool hasItemAtSlot = (nullptr != weapon);
+
+		if (hasItemAtSlot)
+		{
+			FInventoryItemEntry fakeWeaponItemEntry;
+			fakeWeaponItemEntry.ItemId = weapon->InventoryId;
+			fakeWeaponItemEntry.Quantity = 1;
+			fakeWeaponItemEntry.State = weapon->WeaponState;
+
+			widgetData.Value->SetItemEntry(fakeWeaponItemEntry);
+		}
+
+		widgetData.Value->SetVisibility(hasItemAtSlot ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+	}
 }

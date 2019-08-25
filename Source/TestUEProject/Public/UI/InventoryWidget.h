@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/InventoryItemWidget.h"
+#include "EWeaponSlotType.h"
 #include "InventoryWidget.generated.h"
 
 class UVerticalBox;
@@ -21,8 +23,11 @@ public:
 	UVerticalBox* ItemsHostWidget = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	TSubclassOf<UUserWidget> ItemWidgetClass;
+	TSubclassOf<UInventoryItemWidget> ItemWidgetClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TMap<EWeaponSlotType, UInventoryItemWidget*> WeaponSlotWidgets;
 
 private:
-	TArray<UUserWidget*> ItemsWidgets;
+	TArray<UInventoryItemWidget*> ItemsWidgets;
 };
