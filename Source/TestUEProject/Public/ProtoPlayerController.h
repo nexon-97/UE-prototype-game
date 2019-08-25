@@ -32,6 +32,8 @@ protected:
 
 	void OnInventoryToggle();
 
+	void OnItemThrow();
+
 protected:
 	UCombatModeCameraOffsetEffect* CombatModeCameraEffect = nullptr;
 };

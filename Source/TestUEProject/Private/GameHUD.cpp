@@ -1,10 +1,45 @@
 #include "GameHUD.h"
 
 #include <GameFramework/PlayerController.h>
+#include <Components/PanelWidget.h>
+#include <Components/CanvasPanelSlot.h>
+#include <Components/CanvasPanel.h>
 
-void AGameHUD::OnOpenInventory_Implementation()
+void AGameHUD::BeginPlay()
 {
+	Super::BeginPlay();
 
+	check(nullptr != OverlaysHostWidget);
+
+	InventoryWidget = CreateWidget<UInventoryWidget>(GetOwningPlayerController(), InventoryWidgetClass);
+	InventoryWidget->AddToViewport();
+	InventoryWidget->SetVisibility(bIsInventoryOpen ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+
+	UCanvasPanelSlot* slot = Cast<UCanvasPanelSlot>(OverlaysHostWidget->AddChild(InventoryWidget));
+	FAnchorData anchorData;
+	anchorData.Anchors = FAnchors(0.f, 0.f, 1.f, 1.f);
+	anchorData.Offsets = FMargin();
+	anchorData.Alignment = FVector2D(0.f, 0.f);
+	slot->SetLayout(anchorData);
+	OverlaysHostWidget->InvalidateLayoutAndVolatility();
+}
+
+void AGameHUD::OnOpenInventory()
+{
+	bIsInventoryOpen = !bIsInventoryOpen;
+	GetOwningPlayerController()->bShowMouseCursor = bIsInventoryOpen;
+	InventoryWidget->SetVisibility(bIsInventoryOpen ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+
+	if (bIsInventoryOpen)
+	{
+		GainPlayerInputFocus();
+
+		InventoryWidget->PopulateInventory();
+	}
+	else
+	{
+		FreePlayerInputFocus();
+	}
 }
 
 void AGameHUD::GainPlayerInputFocus()

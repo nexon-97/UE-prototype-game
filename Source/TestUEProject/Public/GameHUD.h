@@ -2,7 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "UI/InventoryWidget.h"
 #include "GameHUD.generated.h"
+
+class UCanvasPanel;
 
 UCLASS()
 class TESTUEPROJECT_API AGameHUD
@@ -11,16 +14,31 @@ class TESTUEPROJECT_API AGameHUD
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintNativeEvent)
-	void OnOpenInventory();
-
 	UFUNCTION(BlueprintCallable)
 	void GainPlayerInputFocus();
 
 	UFUNCTION(BlueprintCallable)
 	void FreePlayerInputFocus();
 
+	void OnOpenInventory();
+
+protected:
+	void BeginPlay() override;
+
 public:
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UInventoryWidget* InventoryWidget = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UUserWidget* InGameLayoutWidget = nullptr;
+
+	/* Host widget for all overlay screens (for ex inventory) */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UCanvasPanel* OverlaysHostWidget = nullptr;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bIsInventoryOpen = false;
 

@@ -40,6 +40,7 @@ void AProtoPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("Inventory", IE_Pressed, this, &AProtoPlayerController::OnInventoryToggle);
+	InputComponent->BindAction("Throw", IE_Pressed, this, &AProtoPlayerController::OnItemThrow);
 }
 
 void AProtoPlayerController::OnInventoryToggle()
@@ -49,6 +50,11 @@ void AProtoPlayerController::OnInventoryToggle()
 	{
 		hud->OnOpenInventory();
 	}
+}
+
+void AProtoPlayerController::OnItemThrow()
+{
+
 }
 
 void AProtoPlayerController::OnEquippedWeaponChanged(AWeaponBase* weapon)
