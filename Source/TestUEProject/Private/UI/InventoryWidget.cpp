@@ -5,6 +5,12 @@
 
 #include <Components/VerticalBox.h>
 #include <Components/VerticalBoxSlot.h>
+#include <Engine.h>
+
+void UInventoryWidgetClickContext::OnClick()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Inventory item double click!"));
+}
 
 void UInventoryWidget::PopulateInventory()
 {
@@ -14,6 +20,7 @@ void UInventoryWidget::PopulateInventory()
 		item->RemoveFromParent();
 	}
 	ItemsWidgets.Empty();
+	ClickContexts.Empty();
 
 	// Search for inventory and weapon user components, needed to fill the widgets data
 	UInventoryComponent* InventoryComp = Cast<UInventoryComponent>(GetOwningPlayerPawn()->GetComponentByClass(UInventoryComponent::StaticClass()));
@@ -29,6 +36,11 @@ void UInventoryWidget::PopulateInventory()
 		UInventoryItemWidget* itemWidget = CreateWidget<UInventoryItemWidget>(GetOwningPlayer(), ItemWidgetClass);
 		itemWidget->SetItemEntry(itemEntry);
 		UVerticalBoxSlot* slot = Cast<UVerticalBoxSlot>(ItemsHostWidget->AddChild(itemWidget));
+
+		UInventoryWidgetClickContext* context = NewObject<UInventoryWidgetClickContext>();
+		context->InventoryItemWidget = itemWidget;
+		itemWidget->InventoryItemDblClickDelegate.AddDynamic(context, &UInventoryWidgetClickContext::OnClick);
+		ClickContexts.Add(context);
 
 		ItemsWidgets.Add(itemWidget);
 	}
@@ -48,6 +60,11 @@ void UInventoryWidget::PopulateInventory()
 			fakeWeaponItemEntry.State = weapon->WeaponState;
 
 			widgetData.Value->SetItemEntry(fakeWeaponItemEntry);
+
+			UInventoryWidgetClickContext* context = NewObject<UInventoryWidgetClickContext>();
+			context->InventoryItemWidget = widgetData.Value;
+			widgetData.Value->InventoryItemDblClickDelegate.AddDynamic(context, &UInventoryWidgetClickContext::OnClick);
+			ClickContexts.Add(context);
 		}
 
 		widgetData.Value->SetVisibility(hasItemAtSlot ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);

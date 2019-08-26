@@ -9,6 +9,22 @@
 class UVerticalBox;
 
 UCLASS()
+class TESTUEPROJECT_API UInventoryWidgetClickContext
+	: public UObject
+{
+	GENERATED_BODY()
+
+public:
+	UInventoryWidgetClickContext()
+	{}
+
+	UFUNCTION()
+	void OnClick();
+
+	UInventoryItemWidget* InventoryItemWidget = nullptr;
+};
+
+UCLASS()
 class TESTUEPROJECT_API UInventoryWidget
 	: public UUserWidget
 {
@@ -30,4 +46,6 @@ public:
 
 private:
 	TArray<UInventoryItemWidget*> ItemsWidgets;
+
+	TArray<UInventoryWidgetClickContext*> ClickContexts;
 };
