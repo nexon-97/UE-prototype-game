@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/InventoryComponent.h"
+#include <Components/Button.h>
 #include "InventoryItemWidget.generated.h"
 
 UCLASS()
@@ -16,6 +17,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetItemEntry(const FInventoryItemEntry& entry);
+
+	void NativeOnInitialized() override;
 	
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -30,15 +33,21 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	ESlateVisibility StateProgressVisibility;
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryItemClickDelegate);
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryItemDblClickDelegate);
+	UPROPERTY(BlueprintAssignable, Category = "Event")
+	FOnButtonClickedEvent InventoryItemClickDelegate;
 
-	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FInventoryItemClickDelegate InventoryItemClickDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "Event")
+	FOnButtonClickedEvent InventoryItemDblClickDelegate;
 
-	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FInventoryItemDblClickDelegate InventoryItemDblClickDelegate;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UButton* InteractionWidget;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bIsSelected = false;
+
+private:
+	UFUNCTION()
+	void OnClickInternal();
+
+	float LastClickTime = -1.f;
 };
