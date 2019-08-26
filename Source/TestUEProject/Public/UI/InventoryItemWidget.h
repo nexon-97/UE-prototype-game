@@ -29,4 +29,16 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	ESlateVisibility StateProgressVisibility;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryItemClickDelegate);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryItemDblClickDelegate);
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FInventoryItemClickDelegate InventoryItemClickDelegate;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FInventoryItemDblClickDelegate InventoryItemDblClickDelegate;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bIsSelected = false;
 };
