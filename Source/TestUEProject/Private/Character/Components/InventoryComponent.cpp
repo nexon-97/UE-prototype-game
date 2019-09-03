@@ -9,6 +9,20 @@ UInventoryComponent::UInventoryComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UInventoryComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	int32 entryId = 0;
+	for (FInventoryItemEntry& entry : Items)
+	{
+		entry.EntryId = entryId;
+		++entryId;
+	}
+
+	LastItemId = entryId;
+}
+
 void UInventoryComponent::AddItem(const FInventoryItemEntry& itemData)
 {
 	if (itemData.ItemId == NAME_None)
@@ -28,7 +42,7 @@ void UInventoryComponent::AddItem(const FInventoryItemEntry& itemData)
 	{
 		if (itemDef.bIsBreakable)
 		{
-			Items.Add(itemData);
+			DoAddItem(itemData);
 		}
 		else
 		{
@@ -45,7 +59,7 @@ void UInventoryComponent::AddItem(const FInventoryItemEntry& itemData)
 			}
 			else
 			{
-				Items.Add(itemData);
+				DoAddItem(itemData);
 			}
 		}
 	}
@@ -59,6 +73,24 @@ void UInventoryComponent::AddItem(UInventoryItemComponent* itemComp)
 	itemEntry.State = 100.f;
 
 	AddItem(itemEntry);
+}
+
+void UInventoryComponent::RemoveItem(const int32 entryId)
+{
+	int foundId = -1;
+	for (int i = 0; i < Items.Num(); ++i)
+	{
+		if (Items[i].EntryId == entryId)
+		{
+			foundId = i;
+			break;
+		}
+	}
+
+	if (foundId >= 0)
+	{
+		Items.RemoveAtSwap(foundId);
+	}
 }
 
 int32 UInventoryComponent::FindItemIndexById(const FName& itemId)
@@ -109,4 +141,13 @@ void UInventoryComponent::RemoveItemQuantity(int32 index, int32 quantity)
 		// Remove items with zero quantity
 		Items.RemoveAt(index, 1, true);
 	}
+}
+
+void UInventoryComponent::DoAddItem(const FInventoryItemEntry& itemData)
+{
+	++LastItemId;
+
+	Items.Add(itemData);
+	FInventoryItemEntry& insertedItemData = Items.Last();
+	insertedItemData.EntryId = LastItemId;
 }

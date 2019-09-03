@@ -47,19 +47,32 @@ void UInventoryItemWidget::OnClickInternal()
 
 void UInventoryItemWidget::SetItemEntry(const FInventoryItemEntry& entry)
 {
+	ItemEntry = entry;
+
 	StateProgress = entry.State * 0.01f;
 	QuantityValueText = FText::FromString(FString::FromInt(entry.Quantity));
 	AProtoGameModeBase* gameMode = GetWorld()->GetAuthGameMode<AProtoGameModeBase>();
 
-	FInventoryItemDef itemDef;
-	if (gameMode->InventoryItemsDB->GetItemDef(entry.ItemId, itemDef))
+	if (gameMode->InventoryItemsDB->GetItemDef(entry.ItemId, ItemDef))
 	{
-		ItemName = FText::FromString(itemDef.InventoryName);
-		StateProgressVisibility = itemDef.bIsBreakable ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed;
+		ItemName = FText::FromString(ItemDef.InventoryName);
+		StateProgressVisibility = ItemDef.bIsBreakable ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed;
 	}
 	else
 	{
 		ItemName = k_undefinedItemName;
 		StateProgressVisibility = ESlateVisibility::Collapsed;
+
+		ItemDef = FInventoryItemDef();
 	}
+}
+
+const FInventoryItemEntry& UInventoryItemWidget::GetInventoryItemEntry() const
+{
+	return ItemEntry;
+}
+
+const FInventoryItemDef& UInventoryItemWidget::GetInventoryItemDef() const
+{
+	return ItemDef;
 }

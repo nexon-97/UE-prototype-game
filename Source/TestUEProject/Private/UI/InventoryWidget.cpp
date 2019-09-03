@@ -1,7 +1,9 @@
 #include "UI/InventoryWidget.h"
 #include "Character/Components/InventoryComponent.h"
 #include "Character/Components/WeaponUser.h"
+#include "Character/PlayerCharacter.h"
 #include "ProtoGameModeBase.h"
+#include "ProtoPlayerController.h"
 
 #include <Components/VerticalBox.h>
 #include <Components/VerticalBoxSlot.h>
@@ -9,7 +11,40 @@
 
 void UInventoryWidgetClickContext::OnClick()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, TEXT("Inventory item double click!"));
+	const FInventoryItemEntry& itemEntry = InventoryItemWidget->GetInventoryItemEntry();
+	const FInventoryItemDef& itemDef = InventoryItemWidget->GetInventoryItemDef();
+
+	bool isWeapon = itemDef.WorldActorType->IsChildOf(AWeaponBase::StaticClass());
+	if (isWeapon)
+	{
+		// Double click on a weapon tries to put it into slot
+
+		// Create weapon actor instance
+		if (itemDef.WorldActorType)
+		{
+			AWeaponBase* weaponInstance = OwningWorld->SpawnActor<AWeaponBase>(itemDef.WorldActorType.Get());
+			EWeaponSlotType weaponSlot = weaponInstance->weaponSlotType;
+
+			// Find weapon user component in pawn, and put the created weapon to slot with policy to hide existing slot weapon to inventory
+			AProtoPlayerController* controller = OwningWorld->GetFirstPlayerController<AProtoPlayerController>();
+			APawn* pawn = controller->GetPawn();
+
+			UWeaponUser* weaponUserComp = Cast<UWeaponUser>(pawn->GetComponentByClass(UWeaponUser::StaticClass()));
+			weaponUserComp->SetWeaponAtSlot(weaponSlot, weaponInstance, EWeaponUnequipMethod::HideToInventory);
+
+			// Remove item from inventory
+			UInventoryComponent* inventoryComp = Cast<UInventoryComponent>(pawn->GetComponentByClass(UInventoryComponent::StaticClass()));
+			inventoryComp->RemoveItem(itemEntry.EntryId);
+
+			// Refresh items
+			InventoryWidget->PopulateInventory();
+		}
+	}
+}
+
+UWorld* UInventoryWidgetClickContext::GetWorld() const
+{
+	return OwningWorld;
 }
 
 void UInventoryWidget::PopulateInventory()
@@ -39,6 +74,8 @@ void UInventoryWidget::PopulateInventory()
 
 		UInventoryWidgetClickContext* context = NewObject<UInventoryWidgetClickContext>();
 		context->InventoryItemWidget = itemWidget;
+		context->InventoryWidget = this;
+		context->OwningWorld = GetOwningPlayer()->GetWorld();
 		itemWidget->InventoryItemDblClickDelegate.AddDynamic(context, &UInventoryWidgetClickContext::OnClick);
 		ClickContexts.Add(context);
 
@@ -61,10 +98,15 @@ void UInventoryWidget::PopulateInventory()
 
 			widgetData.Value->SetItemEntry(fakeWeaponItemEntry);
 
-			UInventoryWidgetClickContext* context = NewObject<UInventoryWidgetClickContext>();
-			context->InventoryItemWidget = widgetData.Value;
-			widgetData.Value->InventoryItemDblClickDelegate.AddDynamic(context, &UInventoryWidgetClickContext::OnClick);
-			ClickContexts.Add(context);
+			//auto clickHandler = [widgetData.Value]()
+			//{
+			//
+			//};
+			//UInventoryWidgetClickContext* context = NewObject<UInventoryWidgetClickContext>();
+			//context->InventoryItemWidget = widgetData.Value;
+			//widgetData.Value->InventoryItemDblClickDelegate.AddDynamic(context, &UInventoryWidgetClickContext::OnClick);
+			//widgetData.Value->InventoryItemDblClickDelegate.CreateStatic(clickHandler);
+			//ClickContexts.Add(context);
 		}
 
 		widgetData.Value->SetVisibility(hasItemAtSlot ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);

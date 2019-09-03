@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/InventoryComponent.h"
+#include "InventoryItemDef.h"
 #include <Components/Button.h>
 #include "InventoryItemWidget.generated.h"
 
@@ -19,6 +20,10 @@ public:
 	void SetItemEntry(const FInventoryItemEntry& entry);
 
 	void NativeOnInitialized() override;
+
+	const FInventoryItemEntry& GetInventoryItemEntry() const;
+
+	const FInventoryItemDef& GetInventoryItemDef() const;
 	
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -50,4 +55,8 @@ private:
 	void OnClickInternal();
 
 	float LastClickTime = -1.f;
+
+	FInventoryItemEntry ItemEntry;
+
+	FInventoryItemDef ItemDef;
 };

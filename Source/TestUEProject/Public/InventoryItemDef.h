@@ -25,7 +25,7 @@ public:
 
 	/* Max size of a stack for an item */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 MaxStackSize;
+	int32 MaxStackSize = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftObjectPtr<UTexture> InventoryIcon;
@@ -36,5 +36,5 @@ public:
 
 	/* Means item has state and can be destroyed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bIsBreakable;
+	bool bIsBreakable = false;
 };

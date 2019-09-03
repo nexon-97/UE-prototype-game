@@ -7,6 +7,7 @@
 #include "InventoryWidget.generated.h"
 
 class UVerticalBox;
+class UInventoryWidget;
 
 UCLASS()
 class TESTUEPROJECT_API UInventoryWidgetClickContext
@@ -21,7 +22,13 @@ public:
 	UFUNCTION()
 	void OnClick();
 
+	UWorld* GetWorld() const override;
+
+	UInventoryWidget* InventoryWidget = nullptr;
+
 	UInventoryItemWidget* InventoryItemWidget = nullptr;
+
+	UWorld* OwningWorld = nullptr;
 };
 
 UCLASS()

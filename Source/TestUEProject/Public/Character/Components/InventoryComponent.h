@@ -17,6 +17,10 @@ struct FInventoryItemEntry
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float State = 100.f;
+
+	/* Entry id in the inventory items list (unique for signle UInventoryComponent instance), assigned when item entry is created */
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	int32 EntryId;
 };
 
 class UInventoryItemComponent;
@@ -30,9 +34,13 @@ class TESTUEPROJECT_API UInventoryComponent
 public:	
 	UInventoryComponent();
 
+	void BeginPlay() override;
+
 	void AddItem(const FInventoryItemEntry& itemData);
 
 	void AddItem(UInventoryItemComponent* itemComp);
+
+	void RemoveItem(const int32 entryId);
 
 	/* Finds item index by item inventory id */
 	UFUNCTION(BlueprintCallable)
@@ -50,7 +58,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveItemQuantity(int32 index, int32 quantity);
 
+protected:
+	void DoAddItem(const FInventoryItemEntry& itemData);
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<FInventoryItemEntry> Items;
+
+	int32 LastItemId = -1;
 };
