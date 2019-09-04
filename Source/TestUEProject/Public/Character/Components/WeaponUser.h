@@ -77,4 +77,5 @@ private:
 	void AttachWeaponActorToOwnerSlot(AWeaponBase* weapon);
 	void AttachWeaponActorToOwnerHands(AWeaponBase* weapon);
 	void ThrowWeapon(AWeaponBase* weapon);
+	void HideWeaponToInventory(AWeaponBase* weapon);
 };

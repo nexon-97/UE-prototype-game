@@ -2,6 +2,7 @@
 #include "Character/PlayerAnimInstance.h"
 #include "GameFramework/Pawn.h"
 #include "Components/InputComponent.h"
+#include "Components/InventoryComponent.h"
 
 #include "Engine.h"
 
@@ -87,7 +88,7 @@ void UWeaponUser::UnequipWeapon(EWeaponUnequipMethod unequipMethod)
 		switch (unequipMethod)
 		{
 		case EWeaponUnequipMethod::HideToInventory:
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Hide to inventory not implemented!"));
+			HideWeaponToInventory(EquippedWeapon);
 			break;
 		case EWeaponUnequipMethod::LeaveAtSlot:
 			AttachWeaponActorToOwnerSlot(EquippedWeapon);
@@ -114,7 +115,7 @@ void UWeaponUser::SetWeaponAtSlot(const EWeaponSlotType slot, AWeaponBase* weapo
 		switch (unequipMethod)
 		{
 		case EWeaponUnequipMethod::HideToInventory:
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Hide to inventory not implemented!"));
+			HideWeaponToInventory(*currentWeaponAtSlot);
 			break;
 		case EWeaponUnequipMethod::Throw:
 			ThrowWeapon(*currentWeaponAtSlot);
@@ -210,4 +211,17 @@ void UWeaponUser::ThrowWeapon(AWeaponBase* weapon)
 
 	// Set pickable flag
 	weapon->CanBePicked = true;
+}
+
+void UWeaponUser::HideWeaponToInventory(AWeaponBase* weapon)
+{
+	// Add inventory item
+	UInventoryComponent* inventoryComp = Cast<UInventoryComponent>(GetOwner()->GetComponentByClass(UInventoryComponent::StaticClass()));
+	if (nullptr != inventoryComp)
+	{
+		inventoryComp->AddItem(weapon->InventoryItemData);
+	}
+
+	// Destroy weapon actor
+	weapon->Destroy();
 }
