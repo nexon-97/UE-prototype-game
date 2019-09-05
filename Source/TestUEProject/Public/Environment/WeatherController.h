@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Environment/WeatherPreset.h"
 #include "WeatherController.generated.h"
 
 UCLASS()
@@ -17,19 +18,23 @@ public:
 	void RefreshPresetsActivation();
 
 	UFUNCTION(BlueprintCallable)
-	void SetActiveWeatherPreset(AActor* Preset);
+	void SetActiveWeatherPreset(AWeatherPreset* Preset);
 
 	UFUNCTION(BlueprintCallable)
-	AActor* GetActiveWeatherPreset() const;
+	AWeatherPreset* GetActiveWeatherPreset() const;
+
+#if WITH_EDITOR
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<AActor*> WeatherPresetActors;
+	TArray<AWeatherPreset*> WeatherPresetActors;
 
 protected:
 	void BeginPlay() override;
 
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Active Weather Preset", AllowPrivateAccess = "true"))
-	AActor* ActiveWeatherPreset = nullptr;
+	AWeatherPreset* ActiveWeatherPreset = nullptr;
 };

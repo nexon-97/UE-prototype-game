@@ -14,28 +14,46 @@ void AWeatherController::BeginPlay()
 
 void AWeatherController::RefreshPresetsActivation()
 {
-	for (AActor* Preset : WeatherPresetActors)
+	for (AWeatherPreset* Preset : WeatherPresetActors)
 	{
 		if (nullptr != Preset)
 		{
-			Preset->GetRootComponent()->SetVisibility(false, true);
+			Preset->Deactivate();
 		}
 	}
 
 	if (nullptr != ActiveWeatherPreset)
 	{
-		ActiveWeatherPreset->GetRootComponent()->SetVisibility(true, true);
+		ActiveWeatherPreset->Activate();
 	}
 }
 
-void AWeatherController::SetActiveWeatherPreset(AActor* Preset)
+void AWeatherController::SetActiveWeatherPreset(AWeatherPreset* Preset)
 {
-	ActiveWeatherPreset = Preset;
+	if (Preset != ActiveWeatherPreset)
+	{
+		if (nullptr != ActiveWeatherPreset)
+		{
+			ActiveWeatherPreset->Deactivate();
+		}
 
-	RefreshPresetsActivation();
+		ActiveWeatherPreset = Preset;
+
+		if (nullptr != ActiveWeatherPreset)
+		{
+			ActiveWeatherPreset->Activate();
+		}
+	}
 }
 
-AActor* AWeatherController::GetActiveWeatherPreset() const
+AWeatherPreset* AWeatherController::GetActiveWeatherPreset() const
 {
 	return ActiveWeatherPreset;
+}
+
+void AWeatherController::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	RefreshPresetsActivation();
 }
