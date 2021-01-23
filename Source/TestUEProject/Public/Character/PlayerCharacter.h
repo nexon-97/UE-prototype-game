@@ -25,6 +25,10 @@ public:
 	void LookUp(float AxisValue);
 	void StartJump();
 	void StopJump();
+	void StartWalk();
+	void StopWalk();
+	void StartSprint();
+	void StopSprint();
 	void StartFire();
 	void StopFire();
 	void ReloadWeapon();

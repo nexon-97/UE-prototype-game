@@ -14,13 +14,15 @@ EBTNodeResult::Type USeekWeaponTask::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 	FVector pawnLocation = OwnerComp.GetOwner()->GetActorLocation();
 	FVector traceEnd = pawnLocation + FVector(0.f, 0.f, 15.f);
 	FQuat rotation;
-	FCollisionObjectQueryParams objectParams(FCollisionObjectQueryParams::AllObjects);
+	FCollisionObjectQueryParams objectParams(FCollisionObjectQueryParams::AllDynamicObjects);
 	FCollisionQueryParams queryParams(NAME_None, false, nullptr);
 	const float sightRadius = 5000.f;
 	bool hitFound = GetWorld()->SweepMultiByObjectType(outHits, pawnLocation, traceEnd, rotation, objectParams, FCollisionShape::MakeSphere(sightRadius), queryParams);
 
 	if (hitFound)
 	{
+		return EBTNodeResult::Failed;
+
 		TArray<AWeaponBase*> foundWeapons;
 
 		// Prepare for navmesh query

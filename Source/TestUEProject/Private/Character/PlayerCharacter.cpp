@@ -43,6 +43,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (GetMovementMode() == ECharacterMovementMode::Sprint)
+	{
+		const float SprintStaminaConsumption = 20.f;
+		KillableComponent->RemoveStamina(SprintStaminaConsumption * DeltaTime);
+	}
+
 	RefreshFocusedWorldItem();
 }
 
@@ -57,6 +63,11 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputCom
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::StartJump);
 	InputComponent->BindAction("Jump", IE_Released, this, &APlayerCharacter::StopJump);
+
+	InputComponent->BindAction("Walk", IE_Pressed, this, &APlayerCharacter::StartWalk);
+	InputComponent->BindAction("Walk", IE_Released, this, &APlayerCharacter::StopWalk);
+	InputComponent->BindAction("Sprint", IE_Pressed, this, &APlayerCharacter::StartSprint);
+	InputComponent->BindAction("Sprint", IE_Released, this, &APlayerCharacter::StopSprint);
 
 	// Setup weapon user input
 	InputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::StartFire);
@@ -106,6 +117,32 @@ void APlayerCharacter::StartJump()
 void APlayerCharacter::StopJump()
 {
 	StopJumping();
+}
+
+void APlayerCharacter::StartWalk()
+{
+	SetMovementMode(ECharacterMovementMode::Walk);
+}
+
+void APlayerCharacter::StopWalk()
+{
+	if (!KillableComponent->bIsExhausted)
+	{
+		SetMovementMode(ECharacterMovementMode::Jog);
+	}
+}
+
+void APlayerCharacter::StartSprint()
+{
+	if (!KillableComponent->bIsExhausted)
+	{
+		SetMovementMode(ECharacterMovementMode::Sprint);
+	}
+}
+
+void APlayerCharacter::StopSprint()
+{
+	SetMovementMode(ECharacterMovementMode::Jog);
 }
 
 void APlayerCharacter::StartFire()
