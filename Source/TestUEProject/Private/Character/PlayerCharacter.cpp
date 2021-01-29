@@ -11,20 +11,34 @@
 
 #include "Engine.h"
 
+namespace
+{
+
+const float AimFOVDegress = 45.f;
+const float RegularFOVDegress = 90.f;
+
+}
+
 APlayerCharacter::APlayerCharacter()
 {
 	m_weaponUser = CreateDefaultSubobject<UWeaponUser>(TEXT("WeaponUser"));
 	m_weaponUser->bEditableWhenInherited = true;
 
-	FAttachmentTransformRules attachmentRules(EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, false);
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, false);
 
-	m_cameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	m_cameraSpringArm->bEditableWhenInherited = true;
-	m_cameraSpringArm->AttachToComponent(RootComponent, attachmentRules);
+	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraSpringArm->bEditableWhenInherited = true;
+	CameraSpringArm->AttachToComponent(RootComponent, AttachmentRules);
 
-	m_camera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	m_camera->bEditableWhenInherited = true;
-	m_camera->AttachToComponent(m_cameraSpringArm, attachmentRules, FName(TEXT("SpringEndpoint")));
+	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
+	FirstPersonCamera->bEditableWhenInherited = true;
+	FirstPersonCamera->AttachToComponent(RootComponent, AttachmentRules);
+	FirstPersonCamera->SetActive(false);
+
+	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	ThirdPersonCamera->bEditableWhenInherited = true;
+	ThirdPersonCamera->AttachToComponent(CameraSpringArm, AttachmentRules);
+	ThirdPersonCamera->SetActive(false);
 
 	GetMesh()->SetAnimInstanceClass(UPlayerAnimInstance::StaticClass());
 
@@ -34,9 +48,23 @@ APlayerCharacter::APlayerCharacter()
 	m_inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 }
 
+void APlayerCharacter::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	RefreshCameraParams();
+}
+
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Set default fov of camera
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		ensure(PlayerController->PlayerCameraManager);
+		PlayerController->PlayerCameraManager->SetFOV(RegularFOVDegress);
+	}
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -78,6 +106,8 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InputCom
 	InputComponent->BindAction("EquipRifle", IE_Pressed, this, &APlayerCharacter::EquipRifle);
 	InputComponent->BindAction("Pick", IE_Pressed, this, &APlayerCharacter::OnPickItem);
 	InputComponent->BindAction("Throw", IE_Pressed, this, &APlayerCharacter::OnThrowItem);
+	InputComponent->BindAction("Aim", IE_Pressed, this, &APlayerCharacter::OnStartAim);
+	InputComponent->BindAction("Aim", IE_Released, this, &APlayerCharacter::OnStopAim);
 	//InputComponent->BindAction("EquipGrenade", IE_Pressed, this, &APlayerCharacter::EquipGrenade);
 }
 
@@ -206,6 +236,48 @@ void APlayerCharacter::OnThrowItem()
 	if (nullptr != m_weaponUser->EquippedWeapon)
 	{
 		m_weaponUser->UnequipWeapon(EWeaponUnequipMethod::Throw);
+	}
+}
+
+void APlayerCharacter::OnStartAim()
+{
+	// Set aiming fov of camera
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		ensure(PlayerController->PlayerCameraManager);
+		PlayerController->PlayerCameraManager->SetFOV(AimFOVDegress);
+	}
+}
+
+void APlayerCharacter::OnStopAim()
+{
+	// Set default fov of camera
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		ensure(PlayerController->PlayerCameraManager);
+		PlayerController->PlayerCameraManager->SetFOV(RegularFOVDegress);
+	}
+}
+
+void APlayerCharacter::SetCameraMode(EPlayerCameraMode NewCameraMode)
+{
+	CameraMode = NewCameraMode;
+	RefreshCameraParams();
+}
+
+void APlayerCharacter::RefreshCameraParams()
+{
+	const TMap<EPlayerCameraMode, FName> CameraModeNames =
+	{
+		{ EPlayerCameraMode::FirstPerson, TEXT("FPSCamera") },
+		{ EPlayerCameraMode::ThirdPerson, TEXT("FollowCamera") },
+	};
+
+	const FName* TargetCameraName = CameraModeNames.Find(CameraMode);
+	TArray<UActorComponent*> Cameras = GetComponentsByClass(UCameraComponent::StaticClass());
+	for (UActorComponent* Camera : Cameras)
+	{
+		Camera->SetActive(Camera->GetFName() == *TargetCameraName);
 	}
 }
 
