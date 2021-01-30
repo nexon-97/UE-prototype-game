@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/GameInstance.h"
 #include "NPC/Services/EnemyDetectionService.h"
+#include "DB/GlobalGameConfig.h"
 #include "ProtoGameInstance.generated.h"
 
 UCLASS()
@@ -15,6 +16,13 @@ public:
 	void Init() override;
 	void Shutdown() override;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UEnemyDetectionService* GetEnemyDetectionService() const;
+	
+public:
+	UPROPERTY(EditDefaultsOnly)
+	UGlobalGameConfig* GlobalConfig;
+
+private:
+	UPROPERTY(Transient)
 	UEnemyDetectionService* EnemyDetectionService;
 };

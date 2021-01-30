@@ -1,5 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
+
+#include "Tickable.h"
 #include "NPC/Services/EnemyDetectionState.h"
 #include "NPC/Components/NPCInfo.h"
 #include "EnemyDetectionService.generated.h"
@@ -28,36 +30,58 @@ State transitions:
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FEnemyDetectionStateChanged, UNPCInfo*, EEnemyDetectionState);
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FEnemyDetectionInfo
 {
 	GENERATED_BODY()
 
 	EEnemyDetectionState DetectionState = EEnemyDetectionState::Idle;
+
+	// When detection progress is zero, enemy is not detected, when one - enemy is detected
+	float DetectionProgress = 0.f;
+
+	// Target NPC for search, or to attack
+	TWeakObjectPtr<UNPCInfo> TargetNPC;
+
+	// Position target NPC is last noticed at
+	FVector LastTargetPosition;
 };
 
 UCLASS()
-class UEnemyDetectionService
+class TESTUEPROJECT_API UEnemyDetectionService
 	: public UObject
+	, public FTickableGameObject
 {
 	GENERATED_BODY()
 
 public:
 	UEnemyDetectionService();
 
+	TStatId GetStatId() const override;
+	bool IsTickable() const override;
+
 	void AddNPCInfo(UNPCInfo* NPCInfo);
 	void RemoveNPCInfo(UNPCInfo* NPCInfo);
 
-	void Tick(float DeltaTime);
+	void Tick(float DeltaTime) override;
+	void TickNPC(float DeltaTime, UNPCInfo* NPCInfo, FEnemyDetectionInfo& DetectionInfo);
+
+	UNPCInfo* FindFirstEnemyAtSight(UNPCInfo* NPCInfo, const TArray<UNPCInfo*>& Enemies) const;
+	TArray<UNPCInfo*> BuildEnemiesList(UNPCInfo* NPCInfo) const;
+	bool NPCIsSeenBy(UNPCInfo* NPCInfo, UNPCInfo* OtherNPC) const;
 
 	UFUNCTION(BlueprintCallable)
 	EEnemyDetectionState GetDetectionState(UNPCInfo* NPCInfo) const;
+
+	UFUNCTION(BlueprintCallable)
+	const FEnemyDetectionInfo& GetEnemyDetectionInfo(UNPCInfo* NPCInfo) const;
 
 public:
 	FEnemyDetectionStateChanged OnEnemyDetectionStateChange;
 
 private:
 	void ChangeDetectionState(UNPCInfo* NPCInfo, EEnemyDetectionState NewState);
+	void OnActorKilled(AActor* KilledActor);
 
 private:
 	TMap<TWeakObjectPtr<UNPCInfo>, FEnemyDetectionInfo> LiveNPCs;

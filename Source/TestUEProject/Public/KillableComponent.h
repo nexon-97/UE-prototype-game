@@ -4,7 +4,9 @@
 #include "Components/ActorComponent.h"
 #include "KillableComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FGenericActorKilledEvent, AActor*);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActorKilledEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActorDamagedEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActorExhaustedEvent);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -61,8 +63,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FActorKilledEvent ActorKilledEvent;
 
+	static FGenericActorKilledEvent GenericActorKilledEvent;
+
 	UPROPERTY(BlueprintAssignable)
 	FActorExhaustedEvent ActorExhaustedEvent;
+
+	UPROPERTY(BlueprintAssignable)
+	FActorDamagedEvent OnActorDamaged;
 
 protected:
 	void RestoreHealthAndStamina(float DeltaTime);

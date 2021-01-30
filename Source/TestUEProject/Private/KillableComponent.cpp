@@ -1,6 +1,7 @@
 #include "KillableComponent.h"
-
 #include "Engine.h"
+
+FGenericActorKilledEvent UKillableComponent::GenericActorKilledEvent;
 
 UKillableComponent::UKillableComponent()
 {
@@ -47,8 +48,9 @@ void UKillableComponent::RemoveHealth(const float hp)
 			Controller->Destroy();
 		}
 
-		// Send kill event
+		// Send kill events
 		ActorKilledEvent.Broadcast();
+		GenericActorKilledEvent.Broadcast(GetOwner());
 
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Actor killed!"));
 	}

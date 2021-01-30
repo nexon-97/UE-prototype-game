@@ -30,10 +30,10 @@ APlayerCharacter::APlayerCharacter()
 	CameraSpringArm->bEditableWhenInherited = true;
 	CameraSpringArm->AttachToComponent(RootComponent, AttachmentRules);
 
-	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
-	FirstPersonCamera->bEditableWhenInherited = true;
-	FirstPersonCamera->AttachToComponent(RootComponent, AttachmentRules);
-	FirstPersonCamera->SetActive(false);
+	// FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
+	// FirstPersonCamera->bEditableWhenInherited = true;
+	// FirstPersonCamera->AttachToComponent(RootComponent, AttachmentRules);
+	// FirstPersonCamera->SetActive(false);
 
 	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	ThirdPersonCamera->bEditableWhenInherited = true;

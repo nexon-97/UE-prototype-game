@@ -1,5 +1,6 @@
 #include "NPC/Components/NPCInfo.h"
 #include "ProtoGameInstance.h"
+#include "GameFramework/Pawn.h"
 
 namespace
 {
@@ -18,14 +19,14 @@ void UNPCInfo::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UProtoGameInstance::Get()->EnemyDetectionService->AddNPCInfo(this);
+	UProtoGameInstance::Get()->GetEnemyDetectionService()->AddNPCInfo(this);
 }
 
 void UNPCInfo::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	UProtoGameInstance::Get()->EnemyDetectionService->RemoveNPCInfo(this);
+	UProtoGameInstance::Get()->GetEnemyDetectionService()->RemoveNPCInfo(this);
 }
 
 int32 UNPCInfo::GetId() const
@@ -59,12 +60,25 @@ ENPCRelation UNPCInfo::GetNPCRelation(UNPCInfo* OtherNPC) const
 {
 	ensure(OtherNPC);
 
+	// Check individual relation
 	const ENPCRelation* RelationPtr = NPCRelationOverrides.Find(OtherNPC->GetId());
 	if (RelationPtr)
 	{
 		return *RelationPtr;
 	}
 
+	// Check group relation
+	UGroupDefinitionAsset* const* GroupDefinition = UProtoGameInstance::Get()->GlobalConfig->GroupDefinitions.Find(GetGroup());
+	if (GroupDefinition)
+	{
+		const ENPCRelation* GroupRelationPtr = (*GroupDefinition)->GroupRelations.Find(OtherNPC->GetGroup());
+		if (GroupRelationPtr)
+		{
+			return *GroupRelationPtr;
+		}
+	}
+
+	// Neutral by default
 	return ENPCRelation::Neutral;
 }
 

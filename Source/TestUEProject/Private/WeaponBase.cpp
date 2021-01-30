@@ -4,8 +4,9 @@
 #include "InventoryItemComponent.h"
 #include "KillableComponent.h"
 #include "Engine.h"
+#include "NPCInfo.h"
 
-const ECollisionChannel k_projectileCollisionChannel = ECollisionChannel::ECC_WorldDynamic;
+const ECollisionChannel k_projectileCollisionChannel = ECollisionChannel::ECC_Pawn;
 
 AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer)
 {
@@ -94,13 +95,25 @@ void AWeaponBase::ShootInternal()
 			DrawDebugLine(GetWorld(), fakeTraceStart, hitResult.Location, FColor(255, 0, 0), false, 2.f, 0, 2);
 			DrawDebugSolidBox(GetWorld(), hitResult.Location, FVector(5.f, 5.f, 5.f), FColor(255, 0, 0), false, 2.f);
 
-			TArray<UKillableComponent*> killables;
-			hitResult.GetActor()->GetComponents(killables, false);
-
-			if (killables.Num() > 0)
+			UKillableComponent* Killable = hitResult.GetActor()->FindComponentByClass<UKillableComponent>();
+			if (Killable)
 			{
-				UKillableComponent* killable = *killables.begin();
-				killable->RemoveHealth(26.f);
+				Killable->RemoveHealth(26.f);
+			}
+
+			// Spoil relationships between instigator and damaged actor
+			UNPCInfo* NPCInfo = hitResult.GetActor()->FindComponentByClass<UNPCInfo>();
+			if (NPCInfo)
+			{
+				AActor* AttachParent = GetAttachParentActor();
+				if (AttachParent)
+				{
+					UNPCInfo* InstigatorInfo = AttachParent->FindComponentByClass<UNPCInfo>();
+					if (InstigatorInfo)
+					{
+						NPCInfo->OverrideNPCRelation(InstigatorInfo, ENPCRelation::Enemy);
+					}
+				}
 			}
 		}
 		else

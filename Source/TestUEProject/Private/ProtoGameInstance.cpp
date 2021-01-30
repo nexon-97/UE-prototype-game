@@ -18,7 +18,9 @@ void UProtoGameInstance::Init()
 
 	GGameInstanceRef = this;
 
-	// Spawn services for game mode
+	check(GlobalConfig);
+
+	// Spawn services
 	EnemyDetectionService = NewObject<UEnemyDetectionService>(this, FName("EnemyDetectionService"));
 }
 
@@ -26,7 +28,13 @@ void UProtoGameInstance::Shutdown()
 {
 	Super::Shutdown();
 
+	// Release services
 	EnemyDetectionService = nullptr;
 
 	GGameInstanceRef = nullptr;
+}
+
+UEnemyDetectionService* UProtoGameInstance::GetEnemyDetectionService() const
+{
+	return EnemyDetectionService;
 }
