@@ -41,6 +41,9 @@ public:
 	void UnequipWeapon(EWeaponUnequipMethod unequipMethod = EWeaponUnequipMethod::HideToInventory);
 
 	UFUNCTION(BlueprintCallable)
+	bool IsWeaponEquipped() const;
+
+	UFUNCTION(BlueprintCallable)
 	void SetWeaponAtSlot(const EWeaponSlotType slot, AWeaponBase* weapon, EWeaponUnequipMethod unequipMethod = EWeaponUnequipMethod::HideToInventory);
 
 	UFUNCTION(BlueprintCallable)

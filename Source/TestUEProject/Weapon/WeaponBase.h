@@ -28,8 +28,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetAmmoCountInClip() const;
 
+	//UFUNCTION(BlueprintCallable)
+	//virtual bool Shoot();
+
+	// Try shoot at given location
+	// @return True if shot has been made
 	UFUNCTION(BlueprintCallable)
-	virtual bool Shoot();
+	virtual bool TryShootAtLocation(const FVector& TargetLocation);
 
 	// Loads cartridges to the clip
 	// @param ammoCount - cartridges count to load
@@ -42,7 +47,7 @@ protected:
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	USkeletalMeshComponent* weaponMesh;
+	USkeletalMeshComponent* WeaponMesh;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	UBoxComponent* weaponCollision;
@@ -76,7 +81,10 @@ public:
 	bool CanBePicked = true;
 
 private:
-	int ammoCount = 0;
+	int AmmoCount = 0;
+	
 	FTimerHandle ShootTimer;
+	
+	UPROPERTY(Transient)
 	USkeletalMeshSocket const* FireSocket = nullptr;
 };

@@ -37,8 +37,8 @@ void UWeaponUser::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (IsShooting && nullptr != EquippedWeapon)
-	{
-		EquippedWeapon->Shoot();
+	{ 
+		//EquippedWeapon->TryShootAtLocation();
 	}
 }
 
@@ -102,6 +102,11 @@ void UWeaponUser::UnequipWeapon(EWeaponUnequipMethod unequipMethod)
 		EquippedWeapon = nullptr;
 		EquippedWeaponChangedEvent.Broadcast(nullptr);
 	}
+}
+
+bool UWeaponUser::IsWeaponEquipped() const
+{
+	return nullptr != EquippedWeapon;
 }
 
 void UWeaponUser::SetWeaponAtSlot(const EWeaponSlotType slot, AWeaponBase* weapon, EWeaponUnequipMethod unequipMethod)
@@ -168,7 +173,7 @@ void UWeaponUser::AttachWeaponActorToOwnerSlot(AWeaponBase* weapon)
 {
 	// Disable weapon physics
 	weapon->weaponCollision->SetSimulatePhysics(false);
-	weapon->weaponMesh->SetSimulatePhysics(false);
+	weapon->WeaponMesh->SetSimulatePhysics(false);
 
 	weapon->CanBePicked = false;
 
@@ -189,7 +194,7 @@ void UWeaponUser::AttachWeaponActorToOwnerHands(AWeaponBase* weapon)
 {
 	// Disable weapon physics
 	weapon->weaponCollision->SetSimulatePhysics(false);
-	weapon->weaponMesh->SetSimulatePhysics(false);
+	weapon->WeaponMesh->SetSimulatePhysics(false);
 
 	weapon->CanBePicked = false;
 
@@ -207,7 +212,7 @@ void UWeaponUser::ThrowWeapon(AWeaponBase* weapon)
 
 	// Enable weapon physics
 	weapon->weaponCollision->SetSimulatePhysics(true);
-	weapon->weaponMesh->SetSimulatePhysics(true);
+	weapon->WeaponMesh->SetSimulatePhysics(true);
 
 	// Set pickable flag
 	weapon->CanBePicked = true;

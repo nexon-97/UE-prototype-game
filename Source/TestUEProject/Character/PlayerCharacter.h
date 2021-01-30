@@ -86,4 +86,6 @@ private:
 	EPlayerCameraMode CameraMode;
 
 	class UCameraComponent* PlayerCamera = nullptr;
+
+	bool bIsShooting = false;
 };

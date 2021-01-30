@@ -44,8 +44,11 @@ void UKillableComponent::RemoveHealth(const float hp)
 		if (nullptr != OwnerPawn)
 		{
 			AController* Controller = OwnerPawn->GetController();
-			Controller->UnPossess();
-			Controller->Destroy();
+			if ensure(Controller)
+			{
+				Controller->UnPossess();
+				Controller->Destroy();
+			}
 		}
 
 		// Send kill events

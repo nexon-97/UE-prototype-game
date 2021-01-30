@@ -12,10 +12,10 @@ AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	weaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
-	RootComponent = weaponMesh;
-	weaponMesh->bEditableWhenInherited = true;
-	weaponMesh->SetCollisionProfileName(TEXT("Pickable"));
+	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+	RootComponent = WeaponMesh;
+	WeaponMesh->bEditableWhenInherited = true;
+	WeaponMesh->SetCollisionProfileName(TEXT("Pickable"));
 
 	weaponCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("WeaponCollision"));
 	weaponCollision->SetupAttachment(RootComponent);
@@ -32,28 +32,82 @@ void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	weaponMesh->SetSimulatePhysics(true);
+	WeaponMesh->SetSimulatePhysics(true);
 
-	FireSocket = weaponMesh->GetSocketByName(TEXT("MuzzleFlash"));
+	FireSocket = WeaponMesh->GetSocketByName(TEXT("MuzzleFlash"));
 }
 
 bool AWeaponBase::CanShoot() const
 {
-	bool timerElapsed = !GetWorld()->GetTimerManager().IsTimerActive(ShootTimer);
-	return ammoCount > 0 && timerElapsed;
+	const bool bTimerElapsed = !GetWorld()->GetTimerManager().IsTimerActive(ShootTimer);
+	return AmmoCount > 0 && bTimerElapsed;
 }
 
 int AWeaponBase::GetAmmoCountInClip() const
 {
-	return ammoCount;
+	return AmmoCount;
 }
 
-bool AWeaponBase::Shoot()
+bool AWeaponBase::TryShootAtLocation(const FVector& TargetLocation)
 {
 	if (CanShoot())
 	{
-		ShootInternal();
-		return true;
+		--AmmoCount;
+
+		// Run warmup timer
+		GetWorld()->GetTimerManager().SetTimer(ShootTimer, shootFrequency, false);
+
+		if (nullptr != FireSocket)
+		{
+			const FTransform SocketTransform = FireSocket->GetSocketTransform(WeaponMesh);
+			
+			// Run line trace to determine target to hit
+			FHitResult HitResult;
+			const FVector TraceStart = SocketTransform.GetLocation();
+			const float TraceDistance = 30000.f; // 300 Meters ahead
+			const FVector TraceDirection = (TargetLocation - TraceStart).GetSafeNormal();
+			const FVector TraceEnd = TraceStart + TraceDirection * TraceDistance;
+
+			// Ignore the actor who shoots
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(GetOwner());
+			QueryParams.AddIgnoredActor(this);
+
+			const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, k_projectileCollisionChannel, QueryParams);
+			if (bHit)
+			{
+				DrawDebugLine(GetWorld(), TraceStart, HitResult.Location, FColor(255, 0, 0), false, 2.f, 0, 2);
+				DrawDebugSolidBox(GetWorld(), HitResult.Location, FVector(5.f, 5.f, 5.f), FColor(255, 0, 0), false, 2.f);
+
+				AActor* HitActor = HitResult.GetActor();
+				
+				// Apply damage to the hit target
+				UKillableComponent* Killable = HitActor->FindComponentByClass<UKillableComponent>();
+				if (Killable)
+				{
+					Killable->RemoveHealth(26.f);
+				}
+
+				// Spoil relationships between instigator and damaged actor
+				UNPCInfo* NPCInfo = HitActor->FindComponentByClass<UNPCInfo>();
+				if (NPCInfo)
+				{
+					AActor* AttachParent = GetAttachParentActor();
+					if (AttachParent)
+					{
+						UNPCInfo* InstigatorInfo = AttachParent->FindComponentByClass<UNPCInfo>();
+						if (InstigatorInfo)
+						{
+							NPCInfo->OverrideNPCRelation(InstigatorInfo, ENPCRelation::Enemy);
+						}
+					}
+				}
+			}
+			else
+			{
+				DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor(255, 0, 0), false, 2.f, 0, 2);
+			}
+		}
 	}
 
 	return false;
@@ -61,14 +115,14 @@ bool AWeaponBase::Shoot()
 
 void AWeaponBase::ShootInternal()
 {
-	--ammoCount;
+	--AmmoCount;
 
 	// Run warmup timer
 	GetWorld()->GetTimerManager().SetTimer(ShootTimer, shootFrequency, false);
 
 	if (nullptr != FireSocket)
 	{
-		FTransform socketTransform = FireSocket->GetSocketTransform(weaponMesh);
+		FTransform socketTransform = FireSocket->GetSocketTransform(WeaponMesh);
 		
 		// Run line trace to determine target to hit
 		FHitResult hitResult;
@@ -125,9 +179,9 @@ void AWeaponBase::ShootInternal()
 
 int AWeaponBase::LoadClip(int loadCount)
 {
-	const int remainingToFullLoad = clipSize - ammoCount;
+	const int remainingToFullLoad = clipSize - AmmoCount;
 	int ammoLoaded = FMath::Min(remainingToFullLoad, loadCount);
-	ammoCount += ammoLoaded;
+	AmmoCount += ammoLoaded;
 
 	return ammoLoaded;
 }

@@ -78,6 +78,23 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 
 	RefreshFocusedWorldItem();
+
+	if (bIsShooting && m_weaponUser->EquippedWeapon)
+	{
+		// Run line trace to determine target to hit
+		const float TraceDistance = 30000.f; // 300 Meters ahead
+		FVector DeprojectedLocation;
+		FVector DeprojectedDirection;
+		FVector2D ViewportSize;
+		GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
+		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		PlayerController->DeprojectScreenPositionToWorld(ViewportSize[0] * 0.5f, ViewportSize[1] * 0.5f, DeprojectedLocation, DeprojectedDirection);
+
+		FVector TraceStart = DeprojectedLocation;
+		const FVector TraceEnd = DeprojectedLocation + DeprojectedDirection * TraceDistance;
+		
+		m_weaponUser->EquippedWeapon->TryShootAtLocation(TraceEnd);
+	}
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
@@ -177,12 +194,12 @@ void APlayerCharacter::StopSprint()
 
 void APlayerCharacter::StartFire()
 {
-	m_weaponUser->StartFire();
+	bIsShooting = m_weaponUser->IsWeaponEquipped();
 }
 
 void APlayerCharacter::StopFire()
 {
-	m_weaponUser->StopFire();
+	bIsShooting = false;
 }
 
 void APlayerCharacter::ReloadWeapon()
