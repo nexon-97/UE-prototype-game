@@ -107,13 +107,35 @@ void AGenericNPCController::AttackActor(AActor* TargetActor)
 	}
 }
 
-void AGenericNPCController::EquipBestWeapon() const
+bool AGenericNPCController::EquipBestWeapon() const
 {
-	if (ThisWeaponUser && !ThisWeaponUser->IsWeaponEquipped())
+	if (ThisWeaponUser)
 	{
-		// TODO: Choose best weapon slot
-		ThisWeaponUser->EquipWeapon(EWeaponSlotType::Rifle);
+		if (ThisWeaponUser->IsWeaponEquipped())
+		{
+			return true;
+		}
+		else
+		{
+			// TODO: Choose best weapon slot
+			const bool bEquipped = ThisWeaponUser->EquipWeapon(EWeaponSlotType::Rifle);
+
+			if (bEquipped && ThisWeaponUser->EquippedWeapon)
+			{
+				// Load full clip if not loaded (AI players cheat, don't need to take ammo from inventory)
+				const int32 CurrentClipLoad = ThisWeaponUser->EquippedWeapon->GetAmmoCountInClip();
+				if (CurrentClipLoad < 1)
+				{
+					const int32 AmmoCountToLoad = ThisWeaponUser->EquippedWeapon->clipSize - CurrentClipLoad;
+					ThisWeaponUser->EquippedWeapon->LoadClip(AmmoCountToLoad);
+				}
+			}
+
+			return bEquipped;
+		}
 	}
+
+	return false;
 }
 
 void AGenericNPCController::HideWeapon() const

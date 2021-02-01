@@ -28,9 +28,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetAmmoCountInClip() const;
 
-	//UFUNCTION(BlueprintCallable)
-	//virtual bool Shoot();
-
 	// Try shoot at given location
 	// @return True if shot has been made
 	UFUNCTION(BlueprintCallable)
@@ -40,10 +37,10 @@ public:
 	// @param ammoCount - cartridges count to load
 	// @return Actually loaded cartridges count 
 	UFUNCTION(BlueprintCallable)
-	int LoadClip(int ammoCount);
+	int LoadClip(int32 LoadCount);
 
-protected:
-	virtual void ShootInternal();
+//protected:
+	//virtual void ShootInternal();
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)

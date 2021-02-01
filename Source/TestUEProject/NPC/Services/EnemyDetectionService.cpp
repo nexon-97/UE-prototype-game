@@ -191,21 +191,25 @@ bool UEnemyDetectionService::NPCIsSeenBy(UNPCInfo* NPCInfo, UNPCInfo* OtherNPC) 
 		const float MaxDistance = 5000.f; // 50 meters
 		if (FVector::DistSquared(SourceLocation, TargetLocation) < MaxDistance * MaxDistance)
 		{
-			// Finally cast a ray to know if actor is not obscured
+			// Finally cast a ray to know if there is no visibility blocker between source and target
 			FHitResult OutHit;
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(SourceActor);
+			QueryParams.AddIgnoredActor(TargetActor);
 			const bool bHit = NPCInfo->GetWorld()->LineTraceSingleByChannel(OutHit, SourceLocation, TargetLocation, ECollisionChannel::ECC_Visibility, QueryParams);
+
+			// Debug draw visibility traces
 			if (bHit)
 			{
-				DrawDebugLine(GetWorld(), SourceLocation, OutHit.Location, FColor(0, 200, 0), false, 0.f, 0, 1);
-				DrawDebugSolidBox(GetWorld(), OutHit.Location, FVector(4.f, 4.f, 4.f), FColor(0, 255, 0), false, 0.f);
-				return OutHit.Actor == TargetActor;
+				DrawDebugLine(GetWorld(), SourceLocation, OutHit.Location, FColor(255, 0, 0), false, 0.f, 0, 1);
+				DrawDebugSolidBox(GetWorld(), OutHit.Location, FVector(4.f, 4.f, 4.f), FColor(255, 0, 0), false, 0.f);
 			}
 			else
 			{
-				DrawDebugLine(GetWorld(), SourceLocation, TargetLocation, FColor(255, 255, 0), false, 0.f, 0, 1);
+				DrawDebugLine(GetWorld(), SourceLocation, TargetLocation, FColor(0, 255, 0), false, 0.f, 0, 1);
 			}
+
+			return !bHit;
 		}
 	}
 

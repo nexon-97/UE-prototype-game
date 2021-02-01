@@ -47,7 +47,12 @@ void UKillableComponent::RemoveHealth(const float hp)
 			if ensure(Controller)
 			{
 				Controller->UnPossess();
-				Controller->Destroy();
+
+				// Destroy AI controller only, player controller should be live
+				if (!Controller->IsA<APlayerController>())
+				{
+					Controller->Destroy();
+				}
 			}
 		}
 

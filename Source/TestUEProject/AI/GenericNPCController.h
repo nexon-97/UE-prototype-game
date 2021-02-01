@@ -16,7 +16,7 @@ public:
 	void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	void EquipBestWeapon() const;
+	bool EquipBestWeapon() const;
 	UFUNCTION(BlueprintCallable)
 	void HideWeapon() const;
 

@@ -23,28 +23,21 @@ class TESTUEPROJECT_API UWeaponUser
 	GENERATED_BODY()
 
 public:	
-	UWeaponUser();
+	UWeaponUser(const FObjectInitializer& ObjectInitializer);
 
-protected:
 	void BeginPlay() override;
-
-public:	
-	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	UFUNCTION(BlueprintCallable)
+	bool EquipWeapon(const EWeaponSlotType Slot);
 
 	UFUNCTION(BlueprintCallable)
-	void SetShooting(const bool shooting);
-
-	UFUNCTION(BlueprintCallable)
-	void EquipWeapon(const EWeaponSlotType slot);
-
-	UFUNCTION(BlueprintCallable)
-	void UnequipWeapon(EWeaponUnequipMethod unequipMethod = EWeaponUnequipMethod::HideToInventory);
+	void UnequipWeapon(EWeaponUnequipMethod UnequipMethod = EWeaponUnequipMethod::HideToInventory);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsWeaponEquipped() const;
 
 	UFUNCTION(BlueprintCallable)
-	void SetWeaponAtSlot(const EWeaponSlotType slot, AWeaponBase* weapon, EWeaponUnequipMethod unequipMethod = EWeaponUnequipMethod::HideToInventory);
+	void SetWeaponAtSlot(const EWeaponSlotType Slot, AWeaponBase* Weapon, EWeaponUnequipMethod UnequipMethod = EWeaponUnequipMethod::HideToInventory);
 
 	UFUNCTION(BlueprintCallable)
 	AWeaponBase* GetWeaponAtSlot(const EWeaponSlotType slot) const;
@@ -52,13 +45,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool HasAnyWeapon() const;
 
-	void StartFire();
-	void StopFire();
-
 public:
-	UPROPERTY(BlueprintReadOnly)
-	bool IsShooting = false;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	AWeaponBase* EquippedWeapon = nullptr;
 
@@ -77,8 +64,8 @@ public:
 	FEquippedWeaponChangedEvent EquippedWeaponChangedEvent;
 
 private:
-	void AttachWeaponActorToOwnerSlot(AWeaponBase* weapon);
-	void AttachWeaponActorToOwnerHands(AWeaponBase* weapon);
-	void ThrowWeapon(AWeaponBase* weapon);
-	void HideWeaponToInventory(AWeaponBase* weapon);
+	void AttachWeaponActorToOwnerSlot(AWeaponBase* Weapon);
+	void AttachWeaponActorToOwnerHands(AWeaponBase* Weapon) const;
+	void ThrowWeapon(AWeaponBase* Weapon) const;
+	void HideWeaponToInventory(AWeaponBase* weapon) const;
 };

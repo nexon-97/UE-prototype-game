@@ -1,14 +1,10 @@
 #include "Character/Components/WeaponUser.h"
-#include "Character/PlayerAnimInstance.h"
-#include "GameFramework/Pawn.h"
-#include "Components/InputComponent.h"
 #include "Character/Components/InventoryComponent.h"
-
 #include "Engine.h"
 
-UWeaponUser::UWeaponUser()
+UWeaponUser::UWeaponUser(const FObjectInitializer& ObjectInitializer)
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void UWeaponUser::BeginPlay()
@@ -16,76 +12,64 @@ void UWeaponUser::BeginPlay()
 	Super::BeginPlay();
 
 	// If there are weapon slots assigned, actually attach them to the actor sockets
-	for (auto& weaponSlotData : WeaponSlots)
+	for (auto& WeaponSlotData : WeaponSlots)
 	{
-		if (nullptr == weaponSlotData.Value)
+		if (nullptr == WeaponSlotData.Value)
 			continue;
 		
-		if (weaponSlotData.Value == EquippedWeapon)
+		if (WeaponSlotData.Value == EquippedWeapon)
 		{
-			AttachWeaponActorToOwnerHands(weaponSlotData.Value);
+			AttachWeaponActorToOwnerHands(WeaponSlotData.Value);
 		}
 		else
 		{
-			AttachWeaponActorToOwnerSlot(weaponSlotData.Value);
+			AttachWeaponActorToOwnerSlot(WeaponSlotData.Value);
 		}
 	}
 }
 
-void UWeaponUser::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+bool UWeaponUser::EquipWeapon(const EWeaponSlotType Slot)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (IsShooting && nullptr != EquippedWeapon)
-	{ 
-		//EquippedWeapon->TryShootAtLocation();
-	}
-}
-
-void UWeaponUser::SetShooting(const bool shooting)
-{
-	if (shooting != IsShooting)
+	if (nullptr != EquippedWeapon && EquippedWeapon->weaponSlotType == Slot)
 	{
-		IsShooting = shooting;
-	}
-}
-
-void UWeaponUser::EquipWeapon(const EWeaponSlotType slot)
-{
-	if (nullptr != EquippedWeapon && EquippedWeapon->weaponSlotType == slot)
-	{
+		// TODO: We aren't asked to unequip weapon, that action should be explicitly asked by the higher level code
 		UnequipWeapon(EWeaponUnequipMethod::LeaveAtSlot);
+		return false;
 	}
 	else
 	{
-		AWeaponBase* weapon = nullptr;
-		AWeaponBase** weaponPtr = WeaponSlots.Find(slot);
-		if (nullptr != weaponPtr)
+		AWeaponBase* Weapon = nullptr;
+		AWeaponBase** WeaponPtr = WeaponSlots.Find(Slot);
+		if (nullptr != WeaponPtr)
 		{
-			weapon = *weaponPtr;
+			Weapon = *WeaponPtr;
 		}
 
-		if (weapon != EquippedWeapon)
+		if (Weapon != EquippedWeapon)
 		{
 			UnequipWeapon(EWeaponUnequipMethod::LeaveAtSlot);
 
-			if (nullptr != weapon)
+			if (nullptr != Weapon)
 			{
-				AttachWeaponActorToOwnerHands(weapon);
+				AttachWeaponActorToOwnerHands(Weapon);
 				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("Weapon equipped"));
 
-				EquippedWeapon = weapon;
+				EquippedWeapon = Weapon;
 				EquippedWeaponChangedEvent.Broadcast(EquippedWeapon);
+
+				return true;
 			}
 		}
 	}
+
+	return false;
 }
 
-void UWeaponUser::UnequipWeapon(EWeaponUnequipMethod unequipMethod)
+void UWeaponUser::UnequipWeapon(EWeaponUnequipMethod UnequipMethod)
 {
 	if (nullptr != EquippedWeapon)
 	{
-		switch (unequipMethod)
+		switch (UnequipMethod)
 		{
 		case EWeaponUnequipMethod::HideToInventory:
 			HideWeaponToInventory(EquippedWeapon);
@@ -109,35 +93,34 @@ bool UWeaponUser::IsWeaponEquipped() const
 	return nullptr != EquippedWeapon;
 }
 
-void UWeaponUser::SetWeaponAtSlot(const EWeaponSlotType slot, AWeaponBase* weapon, EWeaponUnequipMethod unequipMethod)
+void UWeaponUser::SetWeaponAtSlot(const EWeaponSlotType Slot, AWeaponBase* Weapon, EWeaponUnequipMethod UnequipMethod)
 {
-	AWeaponBase** currentWeaponAtSlot = WeaponSlots.Find(slot);
-	bool removeSlot = (nullptr == weapon);
-	bool addSlot = (nullptr != currentWeaponAtSlot) && !removeSlot;
+	AWeaponBase** CurrentWeaponAtSlot = WeaponSlots.Find(Slot);
 
-	if (nullptr != currentWeaponAtSlot)
+	if (nullptr != CurrentWeaponAtSlot)
 	{
-		switch (unequipMethod)
+		switch (UnequipMethod)
 		{
 		case EWeaponUnequipMethod::HideToInventory:
-			HideWeaponToInventory(*currentWeaponAtSlot);
+			HideWeaponToInventory(*CurrentWeaponAtSlot);
 			break;
 		case EWeaponUnequipMethod::Throw:
-			ThrowWeapon(*currentWeaponAtSlot);
+			ThrowWeapon(*CurrentWeaponAtSlot);
 			break;
 		case EWeaponUnequipMethod::LeaveAtSlot:
-			weapon->Destroy();
+			// TODO: If we want to set new weapon to the slot, old one should be hidden to inventory instead of just destroyed?
+			Weapon->Destroy();
 			break;
 		}
 
-		WeaponSlots.Remove(slot);
+		WeaponSlots.Remove(Slot);
 	}
 
-	if (nullptr != weapon)
+	if (nullptr != Weapon)
 	{
-		WeaponSlots.Add(slot, weapon);
+		WeaponSlots.Add(Slot, Weapon);
 
-		AttachWeaponActorToOwnerSlot(weapon);
+		AttachWeaponActorToOwnerSlot(Weapon);
 	}
 
 	// Emit event, that weapon at slot has changed
@@ -159,30 +142,21 @@ bool UWeaponUser::HasAnyWeapon() const
 	return WeaponSlots.Num() > 0;
 }
 
-void UWeaponUser::StartFire()
-{
-	SetShooting(true);
-}
-
-void UWeaponUser::StopFire()
-{
-	SetShooting(false);
-}
-
-void UWeaponUser::AttachWeaponActorToOwnerSlot(AWeaponBase* weapon)
+void UWeaponUser::AttachWeaponActorToOwnerSlot(AWeaponBase* Weapon)
 {
 	// Disable weapon physics
-	weapon->weaponCollision->SetSimulatePhysics(false);
-	weapon->WeaponMesh->SetSimulatePhysics(false);
+	Weapon->weaponCollision->SetSimulatePhysics(false);
+	Weapon->WeaponMesh->SetSimulatePhysics(false);
 
-	weapon->CanBePicked = false;
+	// We can't steal weapons from character slot
+	Weapon->CanBePicked = false;
 
 	// Attach weapon actor to a socket on owner
-	FName* socketName = WeaponSlotSockets.Find(weapon->weaponSlotType);
-	if (nullptr != socketName)
+	const FName* SocketName = WeaponSlotSockets.Find(Weapon->weaponSlotType);
+	if (nullptr != SocketName)
 	{
-		FAttachmentTransformRules attachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
-		weapon->AttachToComponent(ActorMesh, attachmentRules, *socketName);
+		const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
+		Weapon->AttachToComponent(ActorMesh, AttachmentRules, *SocketName);
 	}
 	else
 	{
@@ -190,43 +164,43 @@ void UWeaponUser::AttachWeaponActorToOwnerSlot(AWeaponBase* weapon)
 	}
 }
 
-void UWeaponUser::AttachWeaponActorToOwnerHands(AWeaponBase* weapon)
+void UWeaponUser::AttachWeaponActorToOwnerHands(AWeaponBase* Weapon) const
 {
 	// Disable weapon physics
-	weapon->weaponCollision->SetSimulatePhysics(false);
-	weapon->WeaponMesh->SetSimulatePhysics(false);
+	Weapon->weaponCollision->SetSimulatePhysics(false);
+	Weapon->WeaponMesh->SetSimulatePhysics(false);
 
-	weapon->CanBePicked = false;
+	Weapon->CanBePicked = false;
 
 	// Attach weapon actor to a socket on owner
-	FName socketName = TEXT("EquippedPistolHost");
-	FAttachmentTransformRules attachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
-	weapon->AttachToComponent(ActorMesh, attachmentRules, socketName);
+	const FName SocketName = TEXT("EquippedPistolHost");
+	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
+	Weapon->AttachToComponent(ActorMesh, AttachmentRules, SocketName);
 }
 
-void UWeaponUser::ThrowWeapon(AWeaponBase* weapon)
+void UWeaponUser::ThrowWeapon(AWeaponBase* Weapon) const
 {
 	// Detach weapon actor from any parent
-	FDetachmentTransformRules detachmentRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, true);
-	weapon->DetachFromActor(detachmentRules);
+	const FDetachmentTransformRules DetachmentRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, true);
+	Weapon->DetachFromActor(DetachmentRules);
 
 	// Enable weapon physics
-	weapon->weaponCollision->SetSimulatePhysics(true);
-	weapon->WeaponMesh->SetSimulatePhysics(true);
+	Weapon->weaponCollision->SetSimulatePhysics(true);
+	Weapon->WeaponMesh->SetSimulatePhysics(true);
 
 	// Set pickable flag
-	weapon->CanBePicked = true;
+	Weapon->CanBePicked = true;
 }
 
-void UWeaponUser::HideWeaponToInventory(AWeaponBase* weapon)
+void UWeaponUser::HideWeaponToInventory(AWeaponBase* Weapon) const
 {
 	// Add inventory item
 	UInventoryComponent* inventoryComp = Cast<UInventoryComponent>(GetOwner()->GetComponentByClass(UInventoryComponent::StaticClass()));
 	if (nullptr != inventoryComp)
 	{
-		inventoryComp->AddItem(weapon->InventoryItemData);
+		inventoryComp->AddItem(Weapon->InventoryItemData);
 	}
 
 	// Destroy weapon actor
-	weapon->Destroy();
+	Weapon->Destroy();
 }
