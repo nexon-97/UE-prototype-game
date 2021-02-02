@@ -1,8 +1,7 @@
 #include "AI/BT_Tasks/PickWeaponTask.h"
 #include "Weapon/WeaponBase.h"
-#include "Character/Components/WeaponUser.h"
-
-#include <BehaviorTree/BlackboardComponent.h>
+#include "Weapon/Components/WeaponUser.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 #include "Engine.h"
 

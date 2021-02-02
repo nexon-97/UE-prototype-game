@@ -1,7 +1,7 @@
 #include "Weapon/WeaponBase.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/BoxComponent.h"
-#include "Character/Components/InventoryItemComponent.h"
+#include "Items/Components/InventoryItemComponent.h"
 #include "Character/Components/KillableComponent.h"
 #include "Engine.h"
 #include "NPC/Components/NPCInfo.h"

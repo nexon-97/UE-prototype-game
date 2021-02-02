@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "AIController.h"
+#include "AI/NPCCharacter.h"
 #include "GenericNPCController.generated.h"
 
 UCLASS(Blueprintable)
@@ -11,19 +12,19 @@ class TESTUEPROJECT_API AGenericNPCController
 public:
 	AGenericNPCController(const FObjectInitializer& ObjectInitializer);
 	
-	void BeginPlay() override;
+	virtual void BeginPlay() override;
 	
-	void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
-	bool EquipBestWeapon() const;
-	UFUNCTION(BlueprintCallable)
-	void HideWeapon() const;
+	//UFUNCTION(BlueprintCallable)
+	//bool EquipBestWeapon() const;
+	//UFUNCTION(BlueprintCallable)
+	//void HideWeapon() const;
 
-	void AttackActor(AActor* TargetActor);
+	//void AttackActor(AActor* TargetActor);
 
-	void OnPossess(APawn* InPawn) override;
-	void OnUnPossess() override;
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
 
 public:
 	UPROPERTY(EditDefaultsOnly)
@@ -39,10 +40,11 @@ public:
 	UBlackboardData* BlackboardAsset;
 
 private:
+	void BBConfigurePatrolMode(ANPCCharacter* NPC) const;
+	
+private:
 	UPROPERTY(Transient)
 	class UNPCInfo* ThisNPCInfo;
 	UPROPERTY(Transient)
 	class UWeaponUser* ThisWeaponUser;
-	UPROPERTY(Transient)
-	class UBlackboardComponent* ThisBlackboard;
 };

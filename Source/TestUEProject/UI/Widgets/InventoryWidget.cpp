@@ -1,6 +1,6 @@
 #include "UI/Widgets/InventoryWidget.h"
 #include "Character/Components/InventoryComponent.h"
-#include "Character/Components/WeaponUser.h"
+#include "Weapon/Components/WeaponUser.h"
 #include "Character/PlayerCharacter.h"
 #include "System/ProtoGameModeBase.h"
 #include "Character/ProtoPlayerController.h"

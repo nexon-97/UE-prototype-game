@@ -1,5 +1,4 @@
 #include "InventoryItemComponent.h"
-#include "UObject/ConstructorHelpers.h"
 #include "System/ProtoGameModeBase.h"
 
 namespace
@@ -14,8 +13,8 @@ UInventoryItemComponent::UInventoryItemComponent()
 
 bool UInventoryItemComponent::GetItemDef(FInventoryItemDef& itemDef) const
 {
-	AProtoGameModeBase* gameMode = GetWorld()->GetAuthGameMode<AProtoGameModeBase>();
-	return gameMode->InventoryItemsDB->GetItemDef(m_itemInfoId, itemDef);
+	AProtoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AProtoGameModeBase>();
+	return GameMode->InventoryItemsDB->GetItemDef(m_itemInfoId, itemDef);
 }
 
 FString UInventoryItemComponent::GetInventoryName() const

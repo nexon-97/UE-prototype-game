@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/GameInstance.h"
-#include "NPC/Services/EnemyDetectionService.h"
 #include "Data/GlobalGameConfig.h"
+#include "Data/LivePawnsData.h"
 #include "ProtoGameInstance.generated.h"
 
 UCLASS()
@@ -16,13 +16,13 @@ public:
 	void Init() override;
 	void Shutdown() override;
 
-	UEnemyDetectionService* GetEnemyDetectionService() const;
+	ULivePawnsData* GetLivePawnsData() const;
 	
 public:
 	UPROPERTY(EditDefaultsOnly)
 	UGlobalGameConfig* GlobalConfig;
 
-private:
+private:	
 	UPROPERTY(Transient)
-	UEnemyDetectionService* EnemyDetectionService;
+	ULivePawnsData* LivePawnsData;
 };

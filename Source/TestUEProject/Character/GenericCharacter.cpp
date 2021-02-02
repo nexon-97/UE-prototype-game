@@ -1,6 +1,6 @@
 #include "GenericCharacter.h"
-#include "Character/PlayerAnimInstance.h"
-#include "Character/Components/WeaponUser.h"
+#include "Animation/PlayerAnimInstance.h"
+#include "Weapon/Components/WeaponUser.h"
 
 #include "Engine.h"
 

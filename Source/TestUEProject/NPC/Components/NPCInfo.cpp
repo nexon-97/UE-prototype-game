@@ -1,6 +1,5 @@
 #include "NPC/Components/NPCInfo.h"
 #include "System/ProtoGameInstance.h"
-#include "GameFramework/Pawn.h"
 
 namespace
 {
@@ -19,14 +18,14 @@ void UNPCInfo::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UProtoGameInstance::Get()->GetEnemyDetectionService()->AddNPCInfo(this);
+	UProtoGameInstance::Get()->GetLivePawnsData()->RegisterNPCInfo(this);
 }
 
 void UNPCInfo::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	UProtoGameInstance::Get()->GetEnemyDetectionService()->RemoveNPCInfo(this);
+	UProtoGameInstance::Get()->GetLivePawnsData()->UnregisterNPCInfo(this);
 }
 
 int32 UNPCInfo::GetId() const

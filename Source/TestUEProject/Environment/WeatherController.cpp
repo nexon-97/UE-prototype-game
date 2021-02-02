@@ -51,9 +51,11 @@ AWeatherPreset* AWeatherController::GetActiveWeatherPreset() const
 	return ActiveWeatherPreset;
 }
 
+#if WITH_EDITOR
 void AWeatherController::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
 	RefreshPresetsActivation();
 }
+#endif

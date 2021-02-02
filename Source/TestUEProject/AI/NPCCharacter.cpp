@@ -1,5 +1,4 @@
 ﻿#include "AI/NPCCharacter.h"
-#include "NPC/Components/NPCInfo.h"
 
 ANPCCharacter::ANPCCharacter(const FObjectInitializer& ObjectInitializer)
 {
@@ -9,5 +8,12 @@ ANPCCharacter::ANPCCharacter(const FObjectInitializer& ObjectInitializer)
 
 void ANPCCharacter::BeginPlay()
 {
+	NPCInfoComponent = FindComponentByClass<UNPCInfo>();
+	
 	Super::BeginPlay();
+}
+
+UNPCInfo* ANPCCharacter::GetNPCInfo() const
+{
+	return NPCInfoComponent;
 }

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Character/GenericCharacter.h"
 #include "AI/SplinePathActor.h"
+#include "NPC/Components/NPCInfo.h"
 #include "NPCCharacter.generated.h"
 
 UCLASS(Blueprintable)
@@ -14,6 +15,10 @@ class TESTUEPROJECT_API ANPCCharacter
 public:
 	ANPCCharacter(const FObjectInitializer& ObjectInitializer);
 
+	virtual void BeginPlay() override;
+
+	UNPCInfo* GetNPCInfo() const;
+
 public:
 	UPROPERTY(EditAnywhere, Category = "NPC|Patrol")
 	bool bShouldPatrol;
@@ -21,6 +26,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "NPC|Patrol", meta = (EditCondition = "bShouldPatrol"))
 	ASplinePathActor* PatrolPath;
 
-protected:
-	void BeginPlay() override;
+private:
+	UPROPERTY(Transient)
+	UNPCInfo* NPCInfoComponent;
 };

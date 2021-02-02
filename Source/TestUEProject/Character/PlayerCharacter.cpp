@@ -2,12 +2,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/CameraComponent.h"
-#include "Character/Components/WeaponUser.h"
+#include "Weapon/Components/WeaponUser.h"
 #include "Character/Components/InventoryComponent.h"
-#include "Character/PlayerAnimInstance.h"
+#include "Animation/PlayerAnimInstance.h"
 #include "Components/InputComponent.h"
 #include "Data/InventoryItemDef.h"
-#include "Character/Components/InventoryItemComponent.h"
+#include "Items/Components/InventoryItemComponent.h"
 
 #include "Engine.h"
 

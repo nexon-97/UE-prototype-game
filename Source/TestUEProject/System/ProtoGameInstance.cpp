@@ -20,21 +20,21 @@ void UProtoGameInstance::Init()
 
 	check(GlobalConfig);
 
-	// Spawn services
-	EnemyDetectionService = NewObject<UEnemyDetectionService>(this, FName("EnemyDetectionService"));
+	// Spawn game subsystems
+	LivePawnsData = NewObject<ULivePawnsData>(this, FName("LivePawnsData"));
 }
 
 void UProtoGameInstance::Shutdown()
 {
 	Super::Shutdown();
 
-	// Release services
-	EnemyDetectionService = nullptr;
+	// Release game subsystems
+	LivePawnsData = nullptr;
 
 	GGameInstanceRef = nullptr;
 }
 
-UEnemyDetectionService* UProtoGameInstance::GetEnemyDetectionService() const
+ULivePawnsData* UProtoGameInstance::GetLivePawnsData() const
 {
-	return EnemyDetectionService;
+	return LivePawnsData;
 }

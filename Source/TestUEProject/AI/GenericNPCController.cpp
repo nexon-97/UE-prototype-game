@@ -4,7 +4,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "NPC/Components/NPCInfo.h"
 #include "System/ProtoGameInstance.h"
-#include "Character/Components/WeaponUser.h"
+#include "Weapon/Components/WeaponUser.h"
 
 namespace
 {
@@ -24,13 +24,13 @@ AGenericNPCController::AGenericNPCController(const FObjectInitializer& ObjectIni
 
 void AGenericNPCController::OnPossess(APawn* InPawn)
 {
+	ANPCCharacter* NPC = Cast<ANPCCharacter>(InPawn);
 	ThisNPCInfo = InPawn->FindComponentByClass<UNPCInfo>();
 	ThisWeaponUser = InPawn->FindComponentByClass<UWeaponUser>();
-	ThisBlackboard = GetBlackboardComponent();
 	
 	if (BlackboardAsset)
 	{
-		InitializeBlackboard(*ThisBlackboard, *BlackboardAsset);
+		InitializeBlackboard(*Blackboard, *BlackboardAsset);
 	}
 
 	if (BehaviorTree)
@@ -39,33 +39,33 @@ void AGenericNPCController::OnPossess(APawn* InPawn)
 	}
 
 	// Configure default blackboard state
-	ThisBlackboard->SetValueAsBool(HasWeapon_Key, ThisWeaponUser ? ThisWeaponUser->HasAnyWeapon() : false);
-	ThisBlackboard->SetValueAsInt(NextPatrolPointIndex_Key, -1);
+	Blackboard->SetValueAsBool(HasWeapon_Key, ThisWeaponUser ? ThisWeaponUser->HasAnyWeapon() : false);
+	BBConfigurePatrolMode(NPC);
 
-	if (ANPCCharacter* NPC = Cast<ANPCCharacter>(InPawn))
+	Super::OnPossess(InPawn);
+}
+
+void AGenericNPCController::BBConfigurePatrolMode(ANPCCharacter* NPC) const
+{
+	Blackboard->SetValueAsInt(NextPatrolPointIndex_Key, -1);
+
+	if (NPC)
 	{
-		// Configure patrol mode
-		if (NPC->bShouldPatrol && NPC->PatrolPath)
-		{
-			ThisBlackboard->SetValueAsObject(PatrolSpline_Key, NPC->PatrolPath->Spline);
-			ThisBlackboard->SetValueAsBool(PatrolMode_Key, true);
+		const bool bPatrolModeEnabled = (NPC->bShouldPatrol && NPC->PatrolPath && NPC->PatrolPath->Spline);
+		Blackboard->SetValueAsBool(PatrolMode_Key, bPatrolModeEnabled);
+		Blackboard->SetValueAsObject(PatrolSpline_Key, NPC->PatrolPath ? NPC->PatrolPath->Spline : nullptr);
 
+		if (bPatrolModeEnabled)
+		{
 			// Patrol movement should be slow
 			NPC->SetMovementMode(ECharacterMovementMode::Walk);
-		}
-		else
-		{
-			ThisBlackboard->SetValueAsObject(PatrolSpline_Key, nullptr);
-			ThisBlackboard->SetValueAsBool(PatrolMode_Key, false);
 		}
 	}
 	else
 	{
-		ThisBlackboard->SetValueAsBool(PatrolMode_Key, false);
-		ThisBlackboard->SetValueAsObject(PatrolSpline_Key, nullptr);
+		Blackboard->SetValueAsBool(PatrolMode_Key, false);
+		Blackboard->SetValueAsObject(PatrolSpline_Key, nullptr);
 	}
-
-	Super::OnPossess(InPawn);
 }
 
 void AGenericNPCController::OnUnPossess()
@@ -84,65 +84,4 @@ void AGenericNPCController::BeginPlay()
 void AGenericNPCController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (ThisNPCInfo)
-	{
-		const FEnemyDetectionInfo& DetectionInfo = UProtoGameInstance::Get()->GetEnemyDetectionService()->GetEnemyDetectionInfo(ThisNPCInfo);
-		if (DetectionInfo.DetectionState == EEnemyDetectionState::Combat && nullptr != DetectionInfo.TargetNPC)
-		{
-			// Ensure weapon is equipped
-			EquipBestWeapon();
-			
-			// Try shoot target actor
-			AttackActor(DetectionInfo.TargetNPC->GetOwner());
-		}
-	}
-}
-
-void AGenericNPCController::AttackActor(AActor* TargetActor)
-{
-	if (ThisWeaponUser && ThisWeaponUser->IsWeaponEquipped())
-	{
-		ThisWeaponUser->EquippedWeapon->TryShootAtLocation(TargetActor->GetActorLocation());
-	}
-}
-
-bool AGenericNPCController::EquipBestWeapon() const
-{
-	if (ThisWeaponUser)
-	{
-		if (ThisWeaponUser->IsWeaponEquipped())
-		{
-			return true;
-		}
-		else
-		{
-			// TODO: Choose best weapon slot
-			const bool bEquipped = ThisWeaponUser->EquipWeapon(EWeaponSlotType::Rifle);
-
-			if (bEquipped && ThisWeaponUser->EquippedWeapon)
-			{
-				// Load full clip if not loaded (AI players cheat, don't need to take ammo from inventory)
-				const int32 CurrentClipLoad = ThisWeaponUser->EquippedWeapon->GetAmmoCountInClip();
-				if (CurrentClipLoad < 1)
-				{
-					const int32 AmmoCountToLoad = ThisWeaponUser->EquippedWeapon->clipSize - CurrentClipLoad;
-					ThisWeaponUser->EquippedWeapon->LoadClip(AmmoCountToLoad);
-				}
-			}
-
-			return bEquipped;
-		}
-	}
-
-	return false;
-}
-
-void AGenericNPCController::HideWeapon() const
-{
-	if (ThisWeaponUser && ThisWeaponUser->IsWeaponEquipped())
-	{
-		// Unequip weapon back to weapon slot
-		ThisWeaponUser->UnequipWeapon(EWeaponUnequipMethod::LeaveAtSlot);
-	}
 }

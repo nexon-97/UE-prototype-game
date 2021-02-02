@@ -9,6 +9,5 @@ void AProtoGameModeBase::InitGame(const FString& MapName, const FString& Options
 	if (InventoryItemsDBClass)
 	{
 		InventoryItemsDB = GetWorld()->SpawnActor<AInventoryItemsDB>(InventoryItemsDBClass.Get());
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, TEXT("InventoryItemsDBClass instantiated"));
 	}
 }

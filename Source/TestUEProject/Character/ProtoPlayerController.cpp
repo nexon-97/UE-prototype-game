@@ -1,5 +1,5 @@
 #include "ProtoPlayerController.h"
-#include "Character/Components/WeaponUser.h"
+#include "Weapon/Components/WeaponUser.h"
 #include "UI/GameHUD.h"
 
 #include "Engine.h"

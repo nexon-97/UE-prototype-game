@@ -1,4 +1,4 @@
-#include "Character/Components/WeaponUser.h"
+#include "Weapon/Components/WeaponUser.h"
 #include "Character/Components/InventoryComponent.h"
 #include "Engine.h"
 

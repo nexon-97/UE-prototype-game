@@ -1,5 +1,5 @@
 #include "InventoryComponent.h"
-#include "InventoryItemComponent.h"
+#include "Items/Components/InventoryItemComponent.h"
 #include "System/ProtoGameModeBase.h"
 
 #include "Engine.h"
