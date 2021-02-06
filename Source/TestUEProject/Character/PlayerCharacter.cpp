@@ -43,7 +43,6 @@ APlayerCharacter::APlayerCharacter()
 	GetMesh()->SetAnimInstanceClass(UPlayerAnimInstance::StaticClass());
 
 	m_weaponUser->ActorMesh = Cast<UMeshComponent>(GetMesh());
-	m_weaponUser->EquippedWeaponChangedEvent.AddUObject(this, &APlayerCharacter::OnEquippedWeaponChanged);
 
 	m_inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 }
@@ -295,17 +294,6 @@ void APlayerCharacter::RefreshCameraParams()
 	for (UActorComponent* Camera : Cameras)
 	{
 		Camera->SetActive(Camera->GetFName() == *TargetCameraName);
-	}
-}
-
-void APlayerCharacter::OnEquippedWeaponChanged(AWeaponBase* weapon)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Equipped Weapon Changed"));
-
-	UPlayerAnimInstance* animInstance = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
-	if (nullptr != animInstance)
-	{
-		animInstance->bIsEquippingWeapon = (nullptr != weapon);
 	}
 }
 

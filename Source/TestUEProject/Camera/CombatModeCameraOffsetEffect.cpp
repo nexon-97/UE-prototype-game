@@ -1,15 +1,11 @@
 #include "Camera/CombatModeCameraOffsetEffect.h"
-#include "Camera/CameraTypes.h"
-
 #include "Engine.h"
 
-bool UCombatModeCameraOffsetEffect::ModifyCamera(float DeltaTime, struct FMinimalViewInfo& InOutPOV)
+void UCombatModeCameraOffsetEffect::ModifyCamera(float DeltaTime, FVector ViewLocation, FRotator ViewRotation, float FOV, FVector& NewViewLocation, FRotator& NewViewRotation, float& NewFOV)
 {
-	const FVector right = InOutPOV.Rotation.Quaternion().GetRightVector();
-	const FVector up = InOutPOV.Rotation.Quaternion().GetUpVector();
-	const FVector offset(50.f, 0.f, 0.f);
+	const FQuat RotationQuat = ViewRotation.Quaternion();
+	const FVector Right = RotationQuat.GetRightVector();
+	const FVector Up = RotationQuat.GetUpVector();
 
-	InOutPOV.Location += (right * offset.X + up * offset.Z);
-
-	return Super::ModifyCamera(DeltaTime, InOutPOV);
+	NewViewLocation = ViewLocation + Alpha * (Right * OffsetValue.X + Up * OffsetValue.Z);
 }

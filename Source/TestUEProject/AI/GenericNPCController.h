@@ -13,15 +13,6 @@ public:
 	AGenericNPCController(const FObjectInitializer& ObjectInitializer);
 	
 	virtual void BeginPlay() override;
-	
-	virtual void Tick(float DeltaTime) override;
-
-	//UFUNCTION(BlueprintCallable)
-	//bool EquipBestWeapon() const;
-	//UFUNCTION(BlueprintCallable)
-	//void HideWeapon() const;
-
-	//void AttackActor(AActor* TargetActor);
 
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;

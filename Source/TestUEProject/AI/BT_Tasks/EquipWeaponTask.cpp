@@ -11,28 +11,44 @@ EBTNodeResult::Type UEquipWeaponTask::ExecuteTask(UBehaviorTreeComponent& OwnerC
 		UWeaponUser* WeaponUser = Pawn->FindComponentByClass<UWeaponUser>();
 		if (WeaponUser)
 		{
-			// Weapon is already equipped, success
-			if (WeaponUser->IsWeaponEquipped())
+			if (bEquip)
 			{
-				return EBTNodeResult::Succeeded;
+				// Weapon is already equipped, success
+				if (WeaponUser->IsWeaponEquipped())
+				{
+					return EBTNodeResult::Succeeded;
+				}
+				else
+				{
+					// Find some ranged weapon
+					if (WeaponUser->GetWeaponAtSlot(EWeaponSlotType::Rifle))
+					{
+						if (StartEquipWeaponSlot(OwnerComp, WeaponUser, EWeaponSlotType::Rifle))
+						{
+							return EBTNodeResult::InProgress;
+						}
+					}
+
+					if (WeaponUser->GetWeaponAtSlot(EWeaponSlotType::Pistol))
+					{
+						if (StartEquipWeaponSlot(OwnerComp, WeaponUser, EWeaponSlotType::Pistol))
+						{
+							return EBTNodeResult::InProgress;
+						}	
+					}
+				}
 			}
 			else
 			{
-				// Find some ranged weapon
-				if (WeaponUser->GetWeaponAtSlot(EWeaponSlotType::Rifle))
+				// Weapon is not equipped, success
+				if (!WeaponUser->IsWeaponEquipped())
 				{
-					if (StartEquipWeaponSlot(OwnerComp, WeaponUser, EWeaponSlotType::Rifle))
-					{
-						return EBTNodeResult::InProgress;
-					}
+					return EBTNodeResult::Succeeded;
 				}
-
-				if (WeaponUser->GetWeaponAtSlot(EWeaponSlotType::Pistol))
+				else
 				{
-					if (StartEquipWeaponSlot(OwnerComp, WeaponUser, EWeaponSlotType::Pistol))
-					{
-						return EBTNodeResult::InProgress;
-					}	
+					StartUnequipWeapon(OwnerComp, WeaponUser);
+					return EBTNodeResult::InProgress;
 				}
 			}
 		}
@@ -53,6 +69,14 @@ bool UEquipWeaponTask::StartEquipWeaponSlot(UBehaviorTreeComponent& OwnerComp, U
 	}
 
 	return false;
+}
+
+void UEquipWeaponTask::StartUnequipWeapon(UBehaviorTreeComponent& OwnerComp, UWeaponUser* WeaponUser)
+{
+	WeaponUser->UnequipWeapon(EWeaponUnequipMethod::LeaveAtSlot);
+
+	// Start unequip timer
+	GetWorld()->GetTimerManager().SetTimer(EquipTimer, FTimerDelegate::CreateUObject(this, &UEquipWeaponTask::OnEquipTimerFinish, &OwnerComp), 2.f, false);
 }
 
 void UEquipWeaponTask::OnEquipTimerFinish(UBehaviorTreeComponent* OwnerComp) const

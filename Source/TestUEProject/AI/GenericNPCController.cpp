@@ -3,12 +3,12 @@
 #include "AI/NPCCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "NPC/Components/NPCInfo.h"
-#include "System/ProtoGameInstance.h"
 #include "Weapon/Components/WeaponUser.h"
 
 namespace
 {
-	
+
+	const FName HomeLocation_Key = TEXT("HomeLocation");
 	const FName HasWeapon_Key = TEXT("HasWeapon");
 	const FName NextPatrolPointIndex_Key = TEXT("NextPatrolPointIndex");
 	const FName PatrolMode_Key = TEXT("PatrolMode");
@@ -40,6 +40,7 @@ void AGenericNPCController::OnPossess(APawn* InPawn)
 
 	// Configure default blackboard state
 	Blackboard->SetValueAsBool(HasWeapon_Key, ThisWeaponUser ? ThisWeaponUser->HasAnyWeapon() : false);
+	Blackboard->SetValueAsVector(HomeLocation_Key, InPawn->GetActorLocation());
 	BBConfigurePatrolMode(NPC);
 
 	Super::OnPossess(InPawn);
@@ -79,9 +80,4 @@ void AGenericNPCController::OnUnPossess()
 void AGenericNPCController::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void AGenericNPCController::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }

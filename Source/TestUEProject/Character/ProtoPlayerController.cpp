@@ -13,20 +13,23 @@ void AProtoPlayerController::SpawnPlayerCameraManager()
 
 void AProtoPlayerController::InitCameraModifiers()
 {
-	CombatModeCameraEffect = Cast<UCombatModeCameraOffsetEffect>(PlayerCameraManager->AddNewCameraModifier(UCombatModeCameraOffsetEffect::StaticClass()));
-	CombatModeCameraEffect->EnableModifier();
+	if (CombatCameraModifierType.Get())
+	{
+		CombatModeCameraEffect = Cast<UCombatModeCameraOffsetEffect>(PlayerCameraManager->AddNewCameraModifier(CombatCameraModifierType));
+		CombatModeCameraEffect->EnableModifier();
+	}
 }
 
-void AProtoPlayerController::OnPossess(APawn* aPawn)
+void AProtoPlayerController::OnPossess(APawn* NewPawn)
 {
-	Super::OnPossess(aPawn);
+	Super::OnPossess(NewPawn);
 
-	UWeaponUser* weaponUser = Cast<UWeaponUser>(aPawn->GetComponentByClass(UWeaponUser::StaticClass()));
-	if (nullptr != weaponUser)
+	UWeaponUser* WeaponUser = Cast<UWeaponUser>(NewPawn->GetComponentByClass(UWeaponUser::StaticClass()));
+	if (nullptr != WeaponUser)
 	{
-		OnEquippedWeaponChanged(weaponUser->EquippedWeapon);
+		OnEquippedWeaponChanged(WeaponUser->EquippedWeapon);
 
-		weaponUser->EquippedWeaponChangedEvent.AddUObject(this, &AProtoPlayerController::OnEquippedWeaponChanged);
+		WeaponUser->EquippedWeaponChangedEvent.AddUObject(this, &AProtoPlayerController::OnEquippedWeaponChanged);
 	}
 }
 
@@ -45,10 +48,9 @@ void AProtoPlayerController::SetupInputComponent()
 
 void AProtoPlayerController::OnInventoryToggle()
 {
-	AGameHUD* hud = Cast<AGameHUD>(GetHUD());
-	if (nullptr != hud)
+	if (AGameHUD* Hud = Cast<AGameHUD>(GetHUD()))
 	{
-		hud->OnOpenInventory();
+		Hud->OnOpenInventory();
 	}
 }
 
@@ -57,11 +59,14 @@ void AProtoPlayerController::OnItemThrow()
 
 }
 
-void AProtoPlayerController::OnEquippedWeaponChanged(AWeaponBase* weapon)
+void AProtoPlayerController::OnEquippedWeaponChanged(AWeaponBase* Weapon)
 {
-	if (nullptr != weapon)
+	if (nullptr != Weapon)
 	{
-		CombatModeCameraEffect->EnableModifier();
+		if (CombatModeCameraEffect)
+		{
+			CombatModeCameraEffect->EnableModifier();
+		}
 
 		// Free pitch
 		PlayerCameraManager->ViewPitchMin = -85.f;
@@ -69,7 +74,10 @@ void AProtoPlayerController::OnEquippedWeaponChanged(AWeaponBase* weapon)
 	}
 	else
 	{
-		CombatModeCameraEffect->DisableModifier();
+		if (CombatModeCameraEffect)
+		{
+			CombatModeCameraEffect->DisableModifier();
+		}
 
 		// Limit camera pitch
 		PlayerCameraManager->ViewPitchMin = -50.f;

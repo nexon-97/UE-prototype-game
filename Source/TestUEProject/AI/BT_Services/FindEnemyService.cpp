@@ -3,6 +3,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Character/Components/KillableComponent.h"
 #include "System/ProtoGameInstance.h"
 
 namespace
@@ -48,7 +49,7 @@ void UFindEnemyService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 				float DetectionProgress = Blackboard->GetValueAsFloat(BB_EnemyDetectionProgress.SelectedKeyName);
 				
 				// Check if target NPC is still visible
-				if (ActorIsSeen(Self, TargetActor))
+				if (!ActorIsDead(TargetActor) && ActorIsSeen(Self, TargetActor))
 				{
 					// Increase detection progress
 					DetectionProgress = FMath::Clamp(DetectionProgress + DeltaSeconds / DetectionDelay, 0.f,1.f);
@@ -78,13 +79,17 @@ void UFindEnemyService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			{
 				if (ActorIsSeen(Self, TargetActor))
 				{
-					// Process combat logic
+					// If we see target actor, but he is dead, become warned
+					if (ActorIsDead(TargetActor))
+					{
+						ChangeDetectionState(Blackboard, EEnemyDetectionState::Warned);
+						Blackboard->SetValueAsObject(BB_TargetEnemy.SelectedKeyName, nullptr);
+					}
 				}
 				else
 				{
 					// Enemy out of sight, start looking for it
 					Blackboard->SetValueAsVector(BB_LastEnemyLocation.SelectedKeyName, TargetActor->GetActorLocation());
-
 					ChangeDetectionState(Blackboard, EEnemyDetectionState::SearchEnemy);
 				}
 			}
@@ -113,8 +118,18 @@ void UFindEnemyService::ChangeDetectionState(UBlackboardComponent* Blackboard, E
 	Blackboard->SetValueAsEnum(BB_EnemyDetectionState.SelectedKeyName, static_cast<uint8>(DetectionState));
 }
 
-bool UFindEnemyService::ActorIsSeen(AActor* Self, AActor* Target) const
+bool UFindEnemyService::ActorIsDead(AActor* Target) const
 {
+	if (UKillableComponent* Killable = Target->FindComponentByClass<UKillableComponent>())
+	{
+		return Killable->bIsKilled;
+	}
+
+	return false;
+}
+
+bool UFindEnemyService::ActorIsSeen(AActor* Self, AActor* Target) const
+{	
 	// Set source location based on NPC eyes position
 	FVector SourceLocation;
 	if (USkeletalMeshComponent* ActorMesh = Self->FindComponentByClass<USkeletalMeshComponent>())
@@ -166,7 +181,7 @@ UNPCInfo* UFindEnemyService::FindFirstEnemyAtSight(AActor* Self, const TArray<UN
 {
 	for (UNPCInfo* EnemyInfo : Enemies)
 	{
-		if (ActorIsSeen(Self, EnemyInfo->GetOwner()))
+		if (!ActorIsDead(EnemyInfo->GetOwner()) && ActorIsSeen(Self, EnemyInfo->GetOwner()))
 		{
 			return EnemyInfo;
 		}

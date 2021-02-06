@@ -12,8 +12,12 @@ class UEquipWeaponTask : public UBTTaskNode
 public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bEquip = true;
+
 private:
 	bool StartEquipWeaponSlot(UBehaviorTreeComponent& OwnerComp, UWeaponUser* WeaponUser, EWeaponSlotType WeaponSlot);
+	void StartUnequipWeapon(UBehaviorTreeComponent& OwnerComp, UWeaponUser* WeaponUser);
 
 	void OnEquipTimerFinish(UBehaviorTreeComponent* OwnerComp) const;
 

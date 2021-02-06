@@ -21,9 +21,9 @@ class TESTUEPROJECT_API APlayerCharacter
 public:
 	APlayerCharacter();
 
-	void OnConstruction(const FTransform& Transform) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
 
-	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	/*
 	* @brief Input handlers
@@ -51,13 +51,10 @@ public:
 
 	void SetCameraMode(EPlayerCameraMode NewCameraMode);
 
-	void OnEquippedWeaponChanged(AWeaponBase* weapon);
-
-	void Tick(float DeltaTime) override;
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 protected:
-	void BeginPlay() override;
-
 	/* Refreshes world actor, that the character is currently looking at, and able to interact with */
 	void RefreshFocusedWorldItem();
 
@@ -85,6 +82,7 @@ private:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	EPlayerCameraMode CameraMode;
 
+	UPROPERTY(Transient)
 	class UCameraComponent* PlayerCamera = nullptr;
 
 	bool bIsShooting = false;

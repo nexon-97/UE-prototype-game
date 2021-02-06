@@ -50,5 +50,6 @@ public:
 private:
 	void ChangeDetectionState(UBlackboardComponent* Blackboard, EEnemyDetectionState DetectionState) const;
 	bool ActorIsSeen(AActor* Self, AActor* Target) const;
+	bool ActorIsDead(AActor* Target) const;
 	UNPCInfo* FindFirstEnemyAtSight(AActor* Self, const TArray<UNPCInfo*>& Enemies) const;
 };
