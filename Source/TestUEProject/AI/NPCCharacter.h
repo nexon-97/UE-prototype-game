@@ -13,7 +13,7 @@ class TESTUEPROJECT_API ANPCCharacter
 	GENERATED_BODY()
 
 public:
-	ANPCCharacter(const FObjectInitializer& ObjectInitializer);
+	ANPCCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 

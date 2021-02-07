@@ -2,8 +2,9 @@
 #include "Engine.h"
 
 FGenericActorKilledEvent UKillableComponent::GenericActorKilledEvent;
+FGenericActorDamagedEvent UKillableComponent::GenericActorDamagedEvent;
 
-UKillableComponent::UKillableComponent()
+UKillableComponent::UKillableComponent(const FObjectInitializer& Initializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -19,6 +20,22 @@ void UKillableComponent::RestoreHealthAndStamina(float DeltaTime)
 {
 	AddHealth(HealthRestoreRate * DeltaTime);
 	AddStamina(StaminaRestoreRate * DeltaTime);
+}
+
+void UKillableComponent::ApplyDamage(AActor* Instigator, float DamageAmount, const FString& ActionDescription)
+{
+	if (DamageAmount > 0.f)
+	{
+		// Can't take damage more than actual health amount
+		DamageAmount = FMath::Min(DamageAmount, Health);
+		
+		// Notify damage taken
+		OnActorDamaged.Broadcast(Instigator, DamageAmount);
+		GenericActorDamagedEvent.Broadcast(GetOwner(), Instigator, DamageAmount);
+
+		// Remove health from component
+		RemoveHealth(DamageAmount);
+	}
 }
 
 void UKillableComponent::AddHealth(const float hp)

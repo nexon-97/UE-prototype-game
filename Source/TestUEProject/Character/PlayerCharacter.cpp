@@ -19,7 +19,7 @@ const float RegularFOVDegress = 90.f;
 
 }
 
-APlayerCharacter::APlayerCharacter()
+APlayerCharacter::APlayerCharacter(const FObjectInitializer& Initializer)
 {
 	m_weaponUser = CreateDefaultSubobject<UWeaponUser>(TEXT("WeaponUser"));
 	m_weaponUser->bEditableWhenInherited = true;

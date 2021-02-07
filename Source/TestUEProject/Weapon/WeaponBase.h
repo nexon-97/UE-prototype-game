@@ -39,9 +39,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int LoadClip(int32 LoadCount);
 
-//protected:
-	//virtual void ShootInternal();
-
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
 	USkeletalMeshComponent* WeaponMesh;

@@ -15,7 +15,7 @@ class TESTUEPROJECT_API AGenericCharacter
 	GENERATED_BODY()
 
 public:
-	AGenericCharacter();
+	AGenericCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	// Called when the game starts or when spawned
@@ -36,7 +36,7 @@ public:
 	FCharacterMovementModeChanged OnCharacterMovementModeChanged;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Killable Component", AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Killable Component", AllowPrivateAccess = "true"))
 	UKillableComponent* KillableComponent = nullptr;
 
 	ECharacterMovementMode CharacterMovementMode = ECharacterMovementMode::Jog;

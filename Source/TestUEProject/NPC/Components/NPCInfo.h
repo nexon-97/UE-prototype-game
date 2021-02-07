@@ -12,7 +12,7 @@ class TESTUEPROJECT_API UNPCInfo
 	GENERATED_BODY()
 
 public:
-	UNPCInfo(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UNPCInfo(const FObjectInitializer& ObjectInitializer);
 
 	void BeginPlay() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

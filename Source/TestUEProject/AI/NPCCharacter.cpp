@@ -1,5 +1,7 @@
 ﻿#include "AI/NPCCharacter.h"
 
+#include "GenericNPCController.h"
+
 ANPCCharacter::ANPCCharacter(const FObjectInitializer& ObjectInitializer)
 {
 	UNPCInfo* NPCInfo = CreateDefaultSubobject<UNPCInfo>(TEXT("NPCInfo"));

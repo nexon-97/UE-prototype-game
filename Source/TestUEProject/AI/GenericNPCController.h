@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "AIController.h"
 #include "AI/NPCCharacter.h"
+#include "BehaviorTree/BehaviorTreeTypes.h"
+
 #include "GenericNPCController.generated.h"
 
 UCLASS(Blueprintable)
@@ -32,6 +34,8 @@ public:
 
 private:
 	void BBConfigurePatrolMode(ANPCCharacter* NPC) const;
+
+	void OnTakeDamage(AActor* Instigator, float DamageAmount);
 	
 private:
 	UPROPERTY(Transient)

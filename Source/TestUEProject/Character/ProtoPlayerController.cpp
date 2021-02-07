@@ -80,7 +80,11 @@ void AProtoPlayerController::OnEquippedWeaponChanged(AWeaponBase* Weapon)
 		}
 
 		// Limit camera pitch
-		PlayerCameraManager->ViewPitchMin = -50.f;
-		PlayerCameraManager->ViewPitchMax = 0.f;
+		//PlayerCameraManager->ViewPitchMin = -50.f;
+		//PlayerCameraManager->ViewPitchMax = 0.f;
+
+		// Free pitch
+		PlayerCameraManager->ViewPitchMin = -85.f;
+		PlayerCameraManager->ViewPitchMax = 85.f;
 	}
 }

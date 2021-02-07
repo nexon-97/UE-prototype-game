@@ -1,5 +1,7 @@
 ﻿#include "AI/GenericNPCController.h"
 
+
+#include "EnemyDetectionState.h"
 #include "AI/NPCCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "NPC/Components/NPCInfo.h"
@@ -13,6 +15,9 @@ namespace
 	const FName NextPatrolPointIndex_Key = TEXT("NextPatrolPointIndex");
 	const FName PatrolMode_Key = TEXT("PatrolMode");
 	const FName PatrolSpline_Key = TEXT("PatrolSpline");
+	const FName EnemyDetectionState_Key = TEXT("EnemyDetectionState");
+	const FName EnemyDetectionTarget_Key = TEXT("EnemyDetectionTarget");
+	const FName LastEnemyLocation_Key = TEXT("LastEnemyLocation");
 	
 }
 
@@ -43,6 +48,12 @@ void AGenericNPCController::OnPossess(APawn* InPawn)
 	Blackboard->SetValueAsVector(HomeLocation_Key, InPawn->GetActorLocation());
 	BBConfigurePatrolMode(NPC);
 
+	// Subscribe to take damage event
+	if (UKillableComponent* Killable = NPC->FindComponentByClass<UKillableComponent>())
+	{
+		Killable->OnActorDamaged.AddUObject(this, &AGenericNPCController::OnTakeDamage);
+	}
+
 	Super::OnPossess(InPawn);
 }
 
@@ -67,6 +78,13 @@ void AGenericNPCController::BBConfigurePatrolMode(ANPCCharacter* NPC) const
 		Blackboard->SetValueAsBool(PatrolMode_Key, false);
 		Blackboard->SetValueAsObject(PatrolSpline_Key, nullptr);
 	}
+}
+
+void AGenericNPCController::OnTakeDamage(AActor* DamageInstigator, float DamageAmount)
+{
+	Blackboard->SetValueAsEnum(EnemyDetectionState_Key, static_cast<uint8>(EEnemyDetectionState::Combat));
+	Blackboard->SetValueAsObject(EnemyDetectionTarget_Key, DamageInstigator);
+	Blackboard->SetValueAsVector(LastEnemyLocation_Key, DamageInstigator->GetActorLocation());
 }
 
 void AGenericNPCController::OnUnPossess()

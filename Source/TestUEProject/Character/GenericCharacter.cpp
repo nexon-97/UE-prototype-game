@@ -13,24 +13,20 @@ const float SprintSpeed = 600.f;
 
 }
 
-AGenericCharacter::AGenericCharacter()
+AGenericCharacter::AGenericCharacter(const FObjectInitializer& Initializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	UKillableComponent* Killable = CreateDefaultSubobject<UKillableComponent>(TEXT("Killable"));
-	Killable->bEditableWhenInherited = true;
+	KillableComponent = CreateDefaultSubobject<UKillableComponent>(TEXT("Killable"));
+	KillableComponent->bEditableWhenInherited = true;
 }
 
 void AGenericCharacter::BeginPlay()
 {
+	KillableComponent->ActorExhaustedEvent.AddDynamic(this, &AGenericCharacter::OnExhausted);
+	KillableComponent->ActorKilledEvent.AddDynamic(this, &AGenericCharacter::OnKilled);
+	
 	Super::BeginPlay();
-
-	KillableComponent = FindComponentByClass<UKillableComponent>();
-	if (nullptr != KillableComponent)
-	{
-		KillableComponent->ActorExhaustedEvent.AddDynamic(this, &AGenericCharacter::OnExhausted);
-		KillableComponent->ActorKilledEvent.AddDynamic(this, &AGenericCharacter::OnKilled);
-	}
 }
 
 void AGenericCharacter::Tick(float DeltaTime)

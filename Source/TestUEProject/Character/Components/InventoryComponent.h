@@ -32,7 +32,7 @@ class TESTUEPROJECT_API UInventoryComponent
 	GENERATED_BODY()
 
 public:	
-	UInventoryComponent();
+	UInventoryComponent(const FObjectInitializer& Initializer);
 
 	void BeginPlay() override;
 

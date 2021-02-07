@@ -80,22 +80,22 @@ bool AWeaponBase::TryShootAtLocation(const FVector& TargetLocation)
 				DrawDebugSolidBox(GetWorld(), HitResult.Location, FVector(5.f, 5.f, 5.f), FColor(255, 0, 0), false, 2.f);
 
 				AActor* HitActor = HitResult.GetActor();
+				AActor* InstigatorActor = GetAttachParentActor();
 				
 				// Apply damage to the hit target
 				UKillableComponent* Killable = HitActor->FindComponentByClass<UKillableComponent>();
 				if (Killable)
 				{
-					Killable->RemoveHealth(26.f);
+					Killable->ApplyDamage(InstigatorActor, 26.f, TEXT("WeaponDamage"));
 				}
 
 				// Spoil relationships between instigator and damaged actor
 				UNPCInfo* NPCInfo = HitActor->FindComponentByClass<UNPCInfo>();
 				if (NPCInfo)
 				{
-					AActor* AttachParent = GetAttachParentActor();
-					if (AttachParent)
+					if (InstigatorActor)
 					{
-						UNPCInfo* InstigatorInfo = AttachParent->FindComponentByClass<UNPCInfo>();
+						UNPCInfo* InstigatorInfo = InstigatorActor->FindComponentByClass<UNPCInfo>();
 						if (InstigatorInfo)
 						{
 							NPCInfo->OverrideNPCRelation(InstigatorInfo, ENPCRelation::Enemy);

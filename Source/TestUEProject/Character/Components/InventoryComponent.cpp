@@ -4,7 +4,7 @@
 
 #include "Engine.h"
 
-UInventoryComponent::UInventoryComponent()
+UInventoryComponent::UInventoryComponent(const FObjectInitializer& Initializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }

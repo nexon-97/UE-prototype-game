@@ -5,8 +5,9 @@
 #include "KillableComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FGenericActorKilledEvent, AActor*);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FActorDamagedEvent, AActor*, float);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FGenericActorDamagedEvent, AActor*, AActor*, float);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActorKilledEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActorDamagedEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActorExhaustedEvent);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -16,7 +17,7 @@ class TESTUEPROJECT_API UKillableComponent
 	GENERATED_BODY()
 
 public:	
-	UKillableComponent();
+	UKillableComponent(const FObjectInitializer& Initializer = FObjectInitializer::Get());
 
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -31,6 +32,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void RemoveStamina(const float StaminaPoints);
+
+	UFUNCTION(BlueprintCallable)
+	void ApplyDamage(AActor* Instigator, float HealthPoints, const FString& ActionDescription = FString(TEXT("GenericDamage")));
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
@@ -64,11 +68,11 @@ public:
 	FActorKilledEvent ActorKilledEvent;
 
 	static FGenericActorKilledEvent GenericActorKilledEvent;
+	static FGenericActorDamagedEvent GenericActorDamagedEvent;
 
 	UPROPERTY(BlueprintAssignable)
 	FActorExhaustedEvent ActorExhaustedEvent;
 
-	UPROPERTY(BlueprintAssignable)
 	FActorDamagedEvent OnActorDamaged;
 
 protected:
