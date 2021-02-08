@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "PlayerCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/CombatModeCameraOffsetEffect.h"
 #include "ProtoPlayerController.generated.h"
@@ -17,11 +19,14 @@ public:
 	virtual void SpawnPlayerCameraManager() override;
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FVector CombatCameraOffset;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UCameraModifier> IdleCameraModifierType;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UCombatModeCameraOffsetEffect> CombatCameraModifierType;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UCameraModifier> AimCameraModifierType;
 
 protected:
 	void InitCameraModifiers();
@@ -34,10 +39,30 @@ protected:
 	virtual void SetupInputComponent() override;
 
 	void OnInventoryToggle();
-
 	void OnItemThrow();
+	void OnStartAim();
+	void OnStopAim();
+	void StartWalk();
+	void StopWalk();
+	void StartSprint();
+	void StopSprint();
+	void EquipKnife();
+	void EquipPistol();
+	void EquipRifle();
 
 protected:
 	UPROPERTY(Transient)
 	UCombatModeCameraOffsetEffect* CombatModeCameraEffect = nullptr;
+
+	UPROPERTY(Transient)
+	UCameraModifier* IdleCameraModifier = nullptr;
+
+	UPROPERTY(Transient)
+	UCameraModifier* AimCameraModifier = nullptr;
+
+	UPROPERTY(Transient)
+	APlayerCharacter* ControlledCharacter = nullptr;
+
+	UPROPERTY(Transient)
+	UWeaponUser* WeaponUser = nullptr;
 };

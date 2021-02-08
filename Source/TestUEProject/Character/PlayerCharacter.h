@@ -34,20 +34,11 @@ public:
 	void LookUp(float AxisValue);
 	void StartJump();
 	void StopJump();
-	void StartWalk();
-	void StopWalk();
-	void StartSprint();
-	void StopSprint();
 	void StartFire();
 	void StopFire();
 	void ReloadWeapon();
-	void EquipKnife();
-	void EquipPistol();
-	void EquipRifle();
 	void OnPickItem();
 	void OnThrowItem();
-	void OnStartAim();
-	void OnStopAim();
 
 	void SetCameraMode(EPlayerCameraMode NewCameraMode);
 
@@ -62,7 +53,7 @@ protected:
 
 private:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Weapon User Component", AllowPrivateAccess = "true"))
-	class UWeaponUser* m_weaponUser = nullptr;
+	class UWeaponUser* WeaponUser = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Inventory", AllowPrivateAccess = "true"))
 	class UInventoryComponent* m_inventory = nullptr;

@@ -11,18 +11,10 @@
 
 #include "Engine.h"
 
-namespace
-{
-
-const float AimFOVDegress = 45.f;
-const float RegularFOVDegress = 90.f;
-
-}
-
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& Initializer)
 {
-	m_weaponUser = CreateDefaultSubobject<UWeaponUser>(TEXT("WeaponUser"));
-	m_weaponUser->bEditableWhenInherited = true;
+	WeaponUser = CreateDefaultSubobject<UWeaponUser>(TEXT("WeaponUser"));
+	WeaponUser->bEditableWhenInherited = true;
 
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, false);
 
@@ -42,7 +34,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& Initializer)
 
 	GetMesh()->SetAnimInstanceClass(UPlayerAnimInstance::StaticClass());
 
-	m_weaponUser->ActorMesh = Cast<UMeshComponent>(GetMesh());
+	WeaponUser->ActorMesh = Cast<UMeshComponent>(GetMesh());
 
 	m_inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 }
@@ -57,13 +49,6 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Set default fov of camera
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
-	{
-		ensure(PlayerController->PlayerCameraManager);
-		PlayerController->PlayerCameraManager->SetFOV(RegularFOVDegress);
-	}
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -78,7 +63,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	RefreshFocusedWorldItem();
 
-	if (bIsShooting && m_weaponUser->EquippedWeapon)
+	if (bIsShooting && WeaponUser->EquippedWeapon)
 	{
 		// Run line trace to determine target to hit
 		const float TraceDistance = 30000.f; // 300 Meters ahead
@@ -92,7 +77,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		FVector TraceStart = DeprojectedLocation;
 		const FVector TraceEnd = DeprojectedLocation + DeprojectedDirection * TraceDistance;
 		
-		m_weaponUser->EquippedWeapon->TryShootAtLocation(TraceEnd);
+		WeaponUser->EquippedWeapon->TryShootAtLocation(TraceEnd);
 	}
 }
 
@@ -108,22 +93,12 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InInputC
 	InInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::StartJump);
 	InInputComponent->BindAction("Jump", IE_Released, this, &APlayerCharacter::StopJump);
 
-	InInputComponent->BindAction("Walk", IE_Pressed, this, &APlayerCharacter::StartWalk);
-	InInputComponent->BindAction("Walk", IE_Released, this, &APlayerCharacter::StopWalk);
-	InInputComponent->BindAction("Sprint", IE_Pressed, this, &APlayerCharacter::StartSprint);
-	InInputComponent->BindAction("Sprint", IE_Released, this, &APlayerCharacter::StopSprint);
-
 	// Setup weapon user input
 	InInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::StartFire);
 	InInputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::StopFire);
 	InInputComponent->BindAction("Reload", IE_Pressed, this, &APlayerCharacter::ReloadWeapon);
-	InInputComponent->BindAction("EquipKnife", IE_Pressed, this, &APlayerCharacter::EquipKnife);
-	InInputComponent->BindAction("EquipPistol", IE_Pressed, this, &APlayerCharacter::EquipPistol);
-	InInputComponent->BindAction("EquipRifle", IE_Pressed, this, &APlayerCharacter::EquipRifle);
 	InInputComponent->BindAction("Pick", IE_Pressed, this, &APlayerCharacter::OnPickItem);
 	InInputComponent->BindAction("Throw", IE_Pressed, this, &APlayerCharacter::OnThrowItem);
-	InInputComponent->BindAction("Aim", IE_Pressed, this, &APlayerCharacter::OnStartAim);
-	InInputComponent->BindAction("Aim", IE_Released, this, &APlayerCharacter::OnStopAim);
 	//InInputComponent->BindAction("EquipGrenade", IE_Pressed, this, &APlayerCharacter::EquipGrenade);
 }
 
@@ -165,35 +140,9 @@ void APlayerCharacter::StopJump()
 	StopJumping();
 }
 
-void APlayerCharacter::StartWalk()
-{
-	SetMovementMode(ECharacterMovementMode::Walk);
-}
-
-void APlayerCharacter::StopWalk()
-{
-	if (!KillableComponent->bIsExhausted)
-	{
-		SetMovementMode(ECharacterMovementMode::Jog);
-	}
-}
-
-void APlayerCharacter::StartSprint()
-{
-	if (!KillableComponent->bIsExhausted)
-	{
-		SetMovementMode(ECharacterMovementMode::Sprint);
-	}
-}
-
-void APlayerCharacter::StopSprint()
-{
-	SetMovementMode(ECharacterMovementMode::Jog);
-}
-
 void APlayerCharacter::StartFire()
 {
-	bIsShooting = m_weaponUser->IsWeaponEquipped();
+	bIsShooting = WeaponUser->IsWeaponEquipped();
 }
 
 void APlayerCharacter::StopFire()
@@ -203,32 +152,17 @@ void APlayerCharacter::StopFire()
 
 void APlayerCharacter::ReloadWeapon()
 {
-	if (nullptr != m_weaponUser->EquippedWeapon)
+	if (nullptr != WeaponUser->EquippedWeapon)
 	{
 		// Find ammo in inventory
-		int32 index = m_inventory->FindItemIndexById(m_weaponUser->EquippedWeapon->AmmoTypeId);
+		int32 index = m_inventory->FindItemIndexById(WeaponUser->EquippedWeapon->AmmoTypeId);
 		if (-1 != index)
 		{
 			FInventoryItemEntry ammoItemEntry = m_inventory->GetItemEntry(index);
-			int loadedCount = m_weaponUser->EquippedWeapon->LoadClip(ammoItemEntry.Quantity);
+			int loadedCount = WeaponUser->EquippedWeapon->LoadClip(ammoItemEntry.Quantity);
 			m_inventory->RemoveItemQuantity(index, loadedCount);
 		}
 	}
-}
-
-void APlayerCharacter::EquipKnife()
-{
-	m_weaponUser->EquipWeapon(EWeaponSlotType::Knife);
-}
-
-void APlayerCharacter::EquipPistol()
-{
-	m_weaponUser->EquipWeapon(EWeaponSlotType::Pistol);
-}
-
-void APlayerCharacter::EquipRifle()
-{
-	m_weaponUser->EquipWeapon(EWeaponSlotType::Rifle);
 }
 
 void APlayerCharacter::OnPickItem()
@@ -249,29 +183,9 @@ void APlayerCharacter::OnPickItem()
 
 void APlayerCharacter::OnThrowItem()
 {
-	if (nullptr != m_weaponUser->EquippedWeapon)
+	if (nullptr != WeaponUser->EquippedWeapon)
 	{
-		m_weaponUser->UnequipWeapon(EWeaponUnequipMethod::Throw);
-	}
-}
-
-void APlayerCharacter::OnStartAim()
-{
-	// Set aiming fov of camera
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
-	{
-		ensure(PlayerController->PlayerCameraManager);
-		PlayerController->PlayerCameraManager->SetFOV(AimFOVDegress);
-	}
-}
-
-void APlayerCharacter::OnStopAim()
-{
-	// Set default fov of camera
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
-	{
-		ensure(PlayerController->PlayerCameraManager);
-		PlayerController->PlayerCameraManager->SetFOV(RegularFOVDegress);
+		WeaponUser->UnequipWeapon(EWeaponUnequipMethod::Throw);
 	}
 }
 

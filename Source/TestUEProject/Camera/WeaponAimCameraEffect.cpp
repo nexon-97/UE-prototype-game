@@ -3,5 +3,5 @@
 
 void UWeaponAimCameraEffect::ModifyCamera(float DeltaTime, FVector ViewLocation, FRotator ViewRotation, float FOV, FVector& NewViewLocation, FRotator& NewViewRotation, float& NewFOV)
 {
-	
+	NewFOV = FMath::Lerp(FOV, TargetFOVDegrees, Alpha);
 }

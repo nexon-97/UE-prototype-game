@@ -12,4 +12,7 @@ class TESTUEPROJECT_API UWeaponAimCameraEffect
 	
 public:
 	virtual void ModifyCamera(float DeltaTime, FVector ViewLocation, FRotator ViewRotation, float FOV, FVector& NewViewLocation, FRotator& NewViewRotation, float& NewFOV) override;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float TargetFOVDegrees;
 };
