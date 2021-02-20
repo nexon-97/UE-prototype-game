@@ -88,30 +88,42 @@ void AProtoPlayerController::OnItemThrow()
 
 void AProtoPlayerController::StartWalk()
 {
-	ControlledCharacter->SetMovementMode(ECharacterMovementMode::Walk);
+	if (ControlledCharacter)
+	{
+		ControlledCharacter->SetMovementMode(ECharacterMovementMode::Walk);
+	}
 }
 
 void AProtoPlayerController::StopWalk()
 {
-	UKillableComponent* Killable = ControlledCharacter->FindComponentByClass<UKillableComponent>();
-	if (!Killable->bIsExhausted)
+	if (ControlledCharacter)
 	{
-		ControlledCharacter->SetMovementMode(ECharacterMovementMode::Jog);
+		UKillableComponent* Killable = ControlledCharacter->FindComponentByClass<UKillableComponent>();
+		if (!Killable->bIsExhausted)
+		{
+			ControlledCharacter->SetMovementMode(ECharacterMovementMode::Jog);
+		}
 	}
 }
 
 void AProtoPlayerController::StartSprint()
 {
-	UKillableComponent* Killable = ControlledCharacter->FindComponentByClass<UKillableComponent>();
-	if (!Killable->bIsExhausted)
+	if (ControlledCharacter)
 	{
-		ControlledCharacter->SetMovementMode(ECharacterMovementMode::Sprint);
+		UKillableComponent* Killable = ControlledCharacter->FindComponentByClass<UKillableComponent>();
+		if (!Killable->bIsExhausted)
+		{
+			ControlledCharacter->SetMovementMode(ECharacterMovementMode::Sprint);
+		}
 	}
 }
 
 void AProtoPlayerController::StopSprint()
 {
-	ControlledCharacter->SetMovementMode(ECharacterMovementMode::Jog);
+	if (ControlledCharacter)
+	{
+		ControlledCharacter->SetMovementMode(ECharacterMovementMode::Jog);
+	}
 }
 
 void AProtoPlayerController::EquipKnife()

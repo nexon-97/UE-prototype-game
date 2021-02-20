@@ -6,19 +6,24 @@
 #include "InventoryItemsDB.generated.h"
 
 UCLASS()
-class TESTUEPROJECT_API AInventoryItemsDB
-	: public AActor
+class TESTUEPROJECT_API UInventoryItemsDB
+	: public UObject
 {
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintCallable)
-	bool GetItemDef(const FName& itemId, FInventoryItemDef& itemDef) const;
+	void Init(UDataTable* InInventoryItemsTable);
+	
+	bool GetItemDef(const FName& ItemId, FInventoryItemDef*& OutItemDef) const;
 
 	UFUNCTION(BlueprintCallable)
-	AActor* SpawnItem(const FName& itemId) const;
+	bool BlueprintGetItemDef(const FName& ItemId, FInventoryItemDef& OutItemDef) const;
+
+	AActor* SpawnItem(const FName& ItemId, const FVector& Location, const FRotator& Rotation, const FActorSpawnParameters& SpawnParameters) const;
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	UDataTable* InventoryDataAsset = nullptr;
+	UPROPERTY(Transient)
+	UDataTable* InventoryItemsTable;
+
+	TMap<FName, FInventoryItemDef*> ItemsDefLookupTable;
 };

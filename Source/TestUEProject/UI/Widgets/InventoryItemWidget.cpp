@@ -5,9 +5,11 @@
 
 namespace
 {
-const FText k_undefinedItemName = FText::FromString(TEXT("<undefined>"));
-const FText k_undefinedQuantityText = FText::FromString(TEXT("0"));
-const float k_timeDeltaForDoubleClick = 0.25f;
+	
+	const FText k_undefinedItemName = FText::FromString(TEXT("<undefined>"));
+	const FText k_undefinedQuantityText = FText::FromString(TEXT("0"));
+	const float k_timeDeltaForDoubleClick = 0.25f;
+	
 }
 
 UInventoryItemWidget::UInventoryItemWidget(const FObjectInitializer& ObjectInitializer)
@@ -45,25 +47,24 @@ void UInventoryItemWidget::OnClickInternal()
 	LastClickTime = timeStamp;
 }
 
-void UInventoryItemWidget::SetItemEntry(const FInventoryItemEntry& entry)
+void UInventoryItemWidget::SetItemEntry(const FInventoryItemEntry& Entry)
 {
-	ItemEntry = entry;
+	ItemEntry = Entry;
 
-	StateProgress = entry.State * 0.01f;
-	QuantityValueText = FText::FromString(FString::FromInt(entry.Quantity));
-	AProtoGameModeBase* gameMode = GetWorld()->GetAuthGameMode<AProtoGameModeBase>();
+	StateProgress = Entry.State * 0.01f;
+	QuantityValueText = FText::FromString(FString::FromInt(Entry.Quantity));
+	AProtoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AProtoGameModeBase>();
 
-	if (gameMode->InventoryItemsDB->GetItemDef(entry.ItemId, ItemDef))
+	if (GameMode->InventoryItemsDB->GetItemDef(Entry.ItemId, ItemDef))
 	{
-		ItemName = FText::FromString(ItemDef.InventoryName);
-		StateProgressVisibility = ItemDef.bIsBreakable ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed;
+		ItemName = FText::FromString(ItemDef->InventoryName);
+		StateProgressVisibility = ItemDef->bIsBreakable ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed;
 	}
 	else
 	{
 		ItemName = k_undefinedItemName;
 		StateProgressVisibility = ESlateVisibility::Collapsed;
-
-		ItemDef = FInventoryItemDef();
+		ItemDef = nullptr;
 	}
 }
 
@@ -74,5 +75,5 @@ const FInventoryItemEntry& UInventoryItemWidget::GetInventoryItemEntry() const
 
 const FInventoryItemDef& UInventoryItemWidget::GetInventoryItemDef() const
 {
-	return ItemDef;
+	return *ItemDef;
 }

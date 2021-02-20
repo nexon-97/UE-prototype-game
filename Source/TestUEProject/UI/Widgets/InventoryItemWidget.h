@@ -58,5 +58,5 @@ private:
 
 	FInventoryItemEntry ItemEntry;
 
-	FInventoryItemDef ItemDef;
+	FInventoryItemDef* ItemDef;
 };

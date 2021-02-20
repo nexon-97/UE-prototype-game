@@ -12,18 +12,17 @@ class TESTUEPROJECT_API UInventoryItemComponent
 	GENERATED_BODY()
 
 public:	
-	UInventoryItemComponent();
+	UInventoryItemComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	UFUNCTION(BlueprintCallable)
-	bool GetItemDef(FInventoryItemDef& itemDef) const;
+	FInventoryItemDef* GetItemDef() const;
 
 	UFUNCTION(BlueprintCallable)
 	FString GetInventoryName() const;
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, meta = (DisplayName = "Item info ID"))
-	FName m_itemInfoId;
+	FName ItemId;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Units"))
-	int m_count;
+	int Quantity;
 };

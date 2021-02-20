@@ -12,12 +12,12 @@ class TESTUEPROJECT_API AProtoGameModeBase
 	GENERATED_BODY()
 
 public:
-	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
-	TSubclassOf<AInventoryItemsDB> InventoryItemsDBClass;
+	UDataTable* InventoryItemsTable;
 
 	UPROPERTY(BlueprintReadOnly, VisibleInstanceOnly)
-	AInventoryItemsDB* InventoryItemsDB;
+	UInventoryItemsDB* InventoryItemsDB;
 };

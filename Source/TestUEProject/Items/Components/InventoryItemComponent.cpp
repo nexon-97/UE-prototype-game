@@ -3,27 +3,35 @@
 
 namespace
 {
-FString k_defaultItemName = "$ITEM_NAME$";
+
+	const FString DefaultItemName = "$ITEM_NAME$";
+
 }
 
-UInventoryItemComponent::UInventoryItemComponent()
+UInventoryItemComponent::UInventoryItemComponent(const FObjectInitializer& ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-bool UInventoryItemComponent::GetItemDef(FInventoryItemDef& itemDef) const
+FInventoryItemDef* UInventoryItemComponent::GetItemDef() const
 {
 	AProtoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AProtoGameModeBase>();
-	return GameMode->InventoryItemsDB->GetItemDef(m_itemInfoId, itemDef);
+	FInventoryItemDef* ItemDef = nullptr;
+	if (GameMode->InventoryItemsDB->GetItemDef(ItemId, ItemDef))
+	{
+		return ItemDef;
+	}
+
+	return nullptr;
 }
 
 FString UInventoryItemComponent::GetInventoryName() const
 {
-	FInventoryItemDef itemDef;
-	if (GetItemDef(itemDef))
+	FInventoryItemDef* ItemDef = GetItemDef();
+	if (ItemDef)
 	{
-		return itemDef.InventoryName;
+		return ItemDef->InventoryName;
 	}
 
-	return k_defaultItemName;
+	return DefaultItemName;
 }

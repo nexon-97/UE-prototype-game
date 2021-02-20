@@ -23,8 +23,8 @@ AWeaponBase::AWeaponBase(const FObjectInitializer& ObjectInitializer)
 
 	InventoryItemData = CreateDefaultSubobject<UInventoryItemComponent>(TEXT("InventoryItemData"));
 	InventoryItemData->bEditableWhenInherited = true;
-	InventoryItemData->m_count = 1;
-	InventoryItemData->m_itemInfoId = InventoryId;
+	InventoryItemData->Quantity = 1;
+	InventoryItemData->ItemId = InventoryId;
 }
 
 // Called when the game starts or when spawned

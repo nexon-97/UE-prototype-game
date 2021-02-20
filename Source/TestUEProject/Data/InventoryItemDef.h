@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Engine/DataTable.h"
+#include "Data/ItemClass.h"
 #include "InventoryItemDef.generated.h"
 
 USTRUCT(BlueprintType)
@@ -12,12 +13,13 @@ struct TESTUEPROJECT_API FInventoryItemDef
 	GENERATED_USTRUCT_BODY()
 	
 public:
-	FInventoryItemDef()
-	{}
-
 	/* Unique string id assigned to an item */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName Id;
+
+	/* Item semantic (usage) class */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EItemClass ItemClass = EItemClass::Misc;
 
 	/* Displayed inventory name */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -1,13 +1,12 @@
 #include "ProtoGameModeBase.h"
 
-#include <Engine.h>
-
 void AProtoGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
-	if (InventoryItemsDBClass)
+	if ensure(InventoryItemsTable)
 	{
-		InventoryItemsDB = GetWorld()->SpawnActor<AInventoryItemsDB>(InventoryItemsDBClass.Get());
+		InventoryItemsDB = NewObject<UInventoryItemsDB>(this);
+		InventoryItemsDB->Init(InventoryItemsTable);
 	}
 }

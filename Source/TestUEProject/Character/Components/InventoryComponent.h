@@ -18,7 +18,7 @@ struct FInventoryItemEntry
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float State = 100.f;
 
-	/* Entry id in the inventory items list (unique for signle UInventoryComponent instance), assigned when item entry is created */
+	/* Entry id in the inventory items list (unique for single UInventoryComponent instance), assigned when item entry is created */
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	int32 EntryId;
 };
@@ -34,36 +34,39 @@ class TESTUEPROJECT_API UInventoryComponent
 public:	
 	UInventoryComponent(const FObjectInitializer& Initializer);
 
-	void BeginPlay() override;
+	virtual void BeginPlay() override;
 
-	void AddItem(const FInventoryItemEntry& itemData);
+	void AddItem(const FInventoryItemEntry& ItemData);
 
-	void AddItem(UInventoryItemComponent* itemComp);
+	void AddItem(UInventoryItemComponent* ItemComp);
 
-	void RemoveItem(const int32 entryId);
+	void RemoveItem(const int32 EntryId);
 
 	/* Finds item index by item inventory id */
 	UFUNCTION(BlueprintCallable)
-	int32 FindItemIndexById(const FName& itemId);
+	int32 FindItemIndexById(const FName& ItemId);
 
 	/* Returns item entry copy by index */
 	UFUNCTION(BlueprintCallable)
-	FInventoryItemEntry GetItemEntry(int32 index) const;
+	FInventoryItemEntry GetItemEntry(int32 Index) const;
 
 	/* Adds quantity to item at index */
 	UFUNCTION(BlueprintCallable)
-	void AddItemQuantity(int32 index, int32 quantity);
+	void AddItemQuantity(int32 Index, int32 Quantity);
 
 	/* Removes given quantity from item at index */
 	UFUNCTION(BlueprintCallable)
-	void RemoveItemQuantity(int32 index, int32 quantity);
+	void RemoveItemQuantity(int32 Index, int32 Quantity);
 
 protected:
-	void DoAddItem(const FInventoryItemEntry& itemData);
+	void DoAddItem(const FInventoryItemEntry& ItemData);
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<FInventoryItemEntry> Items;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool bAutoEquipWeapons = false;
+	
 	int32 LastItemId = -1;
 };

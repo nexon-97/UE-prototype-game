@@ -13,8 +13,8 @@ class TESTUEPROJECT_API UProtoGameInstance
 public:
 	static UProtoGameInstance* Get();
 
-	void Init() override;
-	void Shutdown() override;
+	virtual void Init() override;
+	virtual void Shutdown() override;
 
 	ULivePawnsData* GetLivePawnsData() const;
 	
