@@ -36,7 +36,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& Initializer)
 
 	WeaponUser->ActorMesh = Cast<UMeshComponent>(GetMesh());
 
-	m_inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
+	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 }
 
 void APlayerCharacter::OnConstruction(const FTransform& Transform)
@@ -79,6 +79,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 		
 		WeaponUser->EquippedWeapon->TryShootAtLocation(TraceEnd);
 	}
+
+	// Refresh movement detection
+	const FVector MovementDelta = GetActorLocation() - LastCharacterLocation;
+	const bool bHasMovedLastFrame = !MovementDelta.IsNearlyZero();
+	bIsMoving = bHasMovedLastFrame;
+	LastCharacterLocation = GetActorLocation();
+
+	// Make moving character follow control rotation yaw
+	bUseControllerRotationYaw = bIsMoving;
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InInputComponent)
@@ -98,26 +107,27 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* InInputC
 	InInputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::StopFire);
 	InInputComponent->BindAction("Reload", IE_Pressed, this, &APlayerCharacter::ReloadWeapon);
 	InInputComponent->BindAction("Pick", IE_Pressed, this, &APlayerCharacter::OnPickItem);
-	InInputComponent->BindAction("Throw", IE_Pressed, this, &APlayerCharacter::OnThrowItem);
-	//InInputComponent->BindAction("EquipGrenade", IE_Pressed, this, &APlayerCharacter::EquipGrenade);
 }
 
 void APlayerCharacter::MoveForward(float AxisValue)
 {
-	FRotator rotation = GetControlRotation();
-	rotation.Roll = 0.f;
-	rotation.Pitch = 0.f;
+	FRotator Rotation = GetControlRotation();
+	Rotation.Roll = 0.f;
+	Rotation.Pitch = 0.f;
 
-	AddMovementInput(rotation.Quaternion().GetForwardVector(), AxisValue);
+	//bIsMoving = !FMath::IsNearlyZero(AxisValue);
+	// RefreshControllerControlYawSync();
+
+	AddMovementInput(Rotation.Quaternion().GetForwardVector(), AxisValue);
 }
 
 void APlayerCharacter::MoveRight(float AxisValue)
 {
-	FRotator rotation = GetControlRotation();
-	rotation.Roll = 0.f;
-	rotation.Pitch = 0.f;
+	FRotator Rotation = GetControlRotation();
+	Rotation.Roll = 0.f;
+	Rotation.Pitch = 0.f;
 
-	AddMovementInput(rotation.Quaternion().GetRightVector(), AxisValue);
+	AddMovementInput(Rotation.Quaternion().GetRightVector(), AxisValue);
 }
 
 void APlayerCharacter::Turn(float AxisValue)
@@ -155,14 +165,24 @@ void APlayerCharacter::ReloadWeapon()
 	if (nullptr != WeaponUser->EquippedWeapon)
 	{
 		// Find ammo in inventory
-		int32 index = m_inventory->FindItemIndexById(WeaponUser->EquippedWeapon->AmmoTypeId);
+		int32 index = Inventory->FindItemIndexById(WeaponUser->EquippedWeapon->AmmoTypeId);
 		if (-1 != index)
 		{
-			FInventoryItemEntry ammoItemEntry = m_inventory->GetItemEntry(index);
+			FInventoryItemEntry ammoItemEntry = Inventory->GetItemEntry(index);
 			int loadedCount = WeaponUser->EquippedWeapon->LoadClip(ammoItemEntry.Quantity);
-			m_inventory->RemoveItemQuantity(index, loadedCount);
+			Inventory->RemoveItemQuantity(index, loadedCount);
 		}
 	}
+}
+
+UInventoryComponent* APlayerCharacter::GetInventory() const
+{
+	return Inventory;
+}
+
+bool APlayerCharacter::IsMoving() const
+{
+	return bIsMoving;
 }
 
 void APlayerCharacter::OnPickItem()
@@ -172,20 +192,12 @@ void APlayerCharacter::OnPickItem()
 		UInventoryItemComponent* inventoryItemComp = Cast<UInventoryItemComponent>(FocusedWorldActor->GetComponentByClass(UInventoryItemComponent::StaticClass()));
 		if (nullptr != inventoryItemComp)
 		{
-			m_inventory->AddItem(inventoryItemComp);
+			Inventory->AddItem(inventoryItemComp);
 
 			// Destroy world actor
 			FocusedWorldActor->Destroy();
 			FocusedWorldActor = nullptr;
 		}
-	}
-}
-
-void APlayerCharacter::OnThrowItem()
-{
-	if (nullptr != WeaponUser->EquippedWeapon)
-	{
-		WeaponUser->UnequipWeapon(EWeaponUnequipMethod::Throw);
 	}
 }
 
@@ -208,6 +220,14 @@ void APlayerCharacter::RefreshCameraParams()
 	for (UActorComponent* Camera : Cameras)
 	{
 		Camera->SetActive(Camera->GetFName() == *TargetCameraName);
+	}
+}
+
+void APlayerCharacter::RefreshControllerControlYawSync()
+{
+	if (bUseControllerRotationYaw != bIsMoving)
+	{
+		bUseControllerRotationYaw = bIsMoving;
 	}
 }
 

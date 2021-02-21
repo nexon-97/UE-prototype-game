@@ -17,16 +17,14 @@ class TESTUEPROJECT_API AGenericCharacter
 public:
 	AGenericCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintCallable)
 	ECharacterMovementMode GetMovementMode() const;

@@ -18,10 +18,8 @@ class TESTUEPROJECT_API AWeaponBase
 public:	
 	AWeaponBase(const FObjectInitializer& ObjectInitializer);
 
-protected:
 	virtual void BeginPlay() override;
-
-public:	
+	
 	UFUNCTION(BlueprintCallable)
 	bool CanShoot() const;
 

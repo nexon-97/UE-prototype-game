@@ -5,6 +5,8 @@
 #include "Weapon/WeaponBase.h"
 #include "PlayerCharacter.generated.h"
 
+class UInventoryComponent;
+
 UENUM()
 enum class EPlayerCameraMode
 {
@@ -38,12 +40,16 @@ public:
 	void StopFire();
 	void ReloadWeapon();
 	void OnPickItem();
-	void OnThrowItem();
 
 	void SetCameraMode(EPlayerCameraMode NewCameraMode);
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	UInventoryComponent* GetInventory() const;
+
+	// Returns true if actor location has changed last frame
+	bool IsMoving() const;
 
 protected:
 	/* Refreshes world actor, that the character is currently looking at, and able to interact with */
@@ -51,12 +57,14 @@ protected:
 
 	void RefreshCameraParams();
 
+	void RefreshControllerControlYawSync();
+
 private:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Weapon User Component", AllowPrivateAccess = "true"))
 	class UWeaponUser* WeaponUser = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Inventory", AllowPrivateAccess = "true"))
-	class UInventoryComponent* m_inventory = nullptr;
+	UInventoryComponent* Inventory = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (DisplayName = "Focused world actor", AllowPrivateAccess = "true"))
 	AActor* FocusedWorldActor = nullptr;
@@ -77,4 +85,7 @@ private:
 	class UCameraComponent* PlayerCamera = nullptr;
 
 	bool bIsShooting = false;
+
+	FVector LastCharacterLocation;
+	bool bIsMoving = false;
 };

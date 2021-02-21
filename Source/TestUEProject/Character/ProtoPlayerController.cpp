@@ -1,7 +1,6 @@
 #include "ProtoPlayerController.h"
 #include "Weapon/Components/WeaponUser.h"
 #include "UI/GameHUD.h"
-
 #include "Engine.h"
 
 void AProtoPlayerController::SpawnPlayerCameraManager()
@@ -10,6 +9,11 @@ void AProtoPlayerController::SpawnPlayerCameraManager()
 
 	PlayerCameraManager->DefaultFOV = 90.f;
 	InitCameraModifiers();
+}
+
+bool AProtoPlayerController::IsAiming() const
+{
+	return bIsAiming;
 }
 
 void AProtoPlayerController::InitCameraModifiers()
@@ -83,7 +87,10 @@ void AProtoPlayerController::OnInventoryToggle()
 
 void AProtoPlayerController::OnItemThrow()
 {
-
+	if (nullptr != WeaponUser->EquippedWeapon)
+	{
+		WeaponUser->UnequipWeapon(EWeaponUnequipMethod::Throw);
+	}
 }
 
 void AProtoPlayerController::StartWalk()
@@ -179,14 +186,21 @@ void AProtoPlayerController::OnEquippedWeaponChanged(AWeaponBase* Weapon)
 
 void AProtoPlayerController::OnStartAim()
 {
-	if (AimCameraModifier && WeaponUser->IsWeaponEquipped())
+	if (WeaponUser->IsWeaponEquipped())
 	{
-		AimCameraModifier->EnableModifier();
+		bIsAiming = true;
+
+		if (AimCameraModifier)
+		{
+			AimCameraModifier->EnableModifier();
+		}
 	}
 }
 
 void AProtoPlayerController::OnStopAim()
 {
+	bIsAiming = false;
+	
 	if (AimCameraModifier && !AimCameraModifier->IsDisabled())
 	{
 		AimCameraModifier->DisableModifier();

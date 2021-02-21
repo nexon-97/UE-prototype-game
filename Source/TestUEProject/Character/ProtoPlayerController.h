@@ -15,8 +15,11 @@ class TESTUEPROJECT_API AProtoPlayerController
 {
 	GENERATED_BODY()
 	
-public:
+public:	
 	virtual void SpawnPlayerCameraManager() override;
+
+	UFUNCTION(BlueprintCallable)
+	bool IsAiming() const;
 
 public:
 	UPROPERTY(EditDefaultsOnly)
@@ -65,4 +68,6 @@ protected:
 
 	UPROPERTY(Transient)
 	UWeaponUser* WeaponUser = nullptr;
+
+	bool bIsAiming = false;
 };
